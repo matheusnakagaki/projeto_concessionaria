@@ -25,7 +25,7 @@ export class CarroService {
     if (ano < 1950 || ano > currentYear + 1) {
       throw new Error("Ano não permitido");
     }
-    if (preco < 0 && preco == undefined) {
+    if (preco === undefined || preco <= 0) {
       throw new Error("O valor do carro deve ser maior que zero");
     }
     const novoCarro = new Carro(
@@ -81,7 +81,13 @@ export class CarroService {
     }
     this.carroRepository.remove(id);
   }
+  
+  listarCarrosDisponiveis(): Carro[] {
+    const todosOsCarros = this.carroRepository.listaTodos();
+
+    return todosOsCarros.filter((carro) => {
+      const estoque = this.estoqueRepository.filtraPorIdCarro(carro.id_carro);
+      return estoque && estoque.quantidade > 0;
+    });
+  }
 }
-
-
-// implementar listagem de carros com estoque > 0

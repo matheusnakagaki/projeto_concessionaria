@@ -24,8 +24,15 @@ export function cadastrarCarro(req: Request, res: Response) {
 }
 
 export function listarCarros(req: Request, res: Response) {
-  const carros = carroService.listarCarros();
-  return res.status(200).json(carros);
+  const disponivel = req.query.disponivel;
+
+  if (disponivel === "true") {
+    const carrosDisponiveis = carroService.listarCarrosDisponiveis();
+    return res.status(200).json(carrosDisponiveis);
+  }
+
+  const todos = carroService.listarCarros();
+  return res.status(200).json(todos);
 }
 
 export function buscarPorId(req: Request, res: Response) {
@@ -38,13 +45,14 @@ export function buscarPorId(req: Request, res: Response) {
   }
 }
 
-export function atualizarCliente(req: Request, res: Response) {
+export function atualizarCarro(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
     const carroAtualizado = carroService.atualizarCarro(id, req.body);
     return res.status(200).json(carroAtualizado);
   } catch (error: any) {
-    if (error.message === "Carro não encontrado") return res.status(404).json({ mensagem: error.message });
+    if (error.message === "Carro não encontrado")
+      return res.status(404).json({ mensagem: error.message });
     return res.status(400).json({ mensagem: error.message });
   }
 }
@@ -55,9 +63,10 @@ export function removerCarro(req: Request, res: Response) {
     carroService.removerCarro(id);
     return res.status(200).json({ mensagem: "Carro removido com sucesso!" });
   } catch (error: any) {
-    if (error.message.includes("Não é permitido remover")) return res.status(422).json({ mensagem: error.message });
-    if (error.message === "Carro não encontrado") return res.status(404).json({ mensagem: error.message });
+    if (error.message.includes("Não é permitido remover"))
+      return res.status(422).json({ mensagem: error.message });
+    if (error.message === "Carro não encontrado")
+      return res.status(404).json({ mensagem: error.message });
     return res.status(500).json({ mensagem: "Erro interno no servidor" });
   }
 }
-
