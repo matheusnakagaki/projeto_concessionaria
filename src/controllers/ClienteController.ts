@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { ClienteService } from "../services/ClienteService";
+import { NotaRepository } from "../repositories/NotaRepository";
 
 const clienteService = new ClienteService();
+const notaRepository = NotaRepository.getInstance();
 
 export function cadastrarCliente(req: Request, res: Response) {
   try {
@@ -57,5 +59,16 @@ export function removerCliente(req: Request, res: Response) {
   } catch (error: any) {
     if (error.message.includes("Não é permitido remover")) return res.status(422).json({ mensagem: error.message });
     if (error.message === "Cliente não encontrado") return res.status(404).json({ mensagem: error.message });
+    return res.status(500).json({ mensagem: "Erro interno no servidor" });
+  }
+}
+
+export function listarNotasDoCliente(req: Request, res: Response) {
+  try {
+    const id = parseInt(req.params.id as string);
+    const notas = notaRepository.filtraNotaPorIdCliente(id);
+    return res.status(200).json(notas);
+  } catch (error: any) {
+    return res.status(500).json({ mensagem: "Erro ao buscar notas do cliente" });
   }
 }
