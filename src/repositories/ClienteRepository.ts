@@ -51,7 +51,7 @@ export class ClienteRepository {
     }
   }
 
-  // FILTRO INTERNO (RN01)
+  // FILTRO INTERNO (RN01) -> Validação acontece na camada de serviço
   filtraPorCpf(cpf: string): Cliente | undefined {
     return this.clientes.find((cliente) => cliente.cpf === cpf);
   }
