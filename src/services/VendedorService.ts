@@ -20,12 +20,7 @@ export class VendedorService {
         "Percentual de Comissão deve ser maior que 0 e menor que 30",
       );
     }
-    const novoVendedor = new Vendedor(
-      id_vendedor,
-      nome,
-      matricula,
-      comissao_percentual,
-    );
+    const novoVendedor = new Vendedor(id_vendedor, nome, matricula, comissao_percentual);
     this.vendedorRepository.cadastra(novoVendedor);
     return novoVendedor;
   }
