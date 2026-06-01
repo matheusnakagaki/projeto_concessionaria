@@ -46,7 +46,7 @@ export class CarroRepository {
 
   // REMOÇÃO
   remove(id: number): void {
-    const index = this.carros.findIndex((c) => c.id_carro === id);
+    const index = this.carros.findIndex((carro) => carro.id_carro === id);
     if (index !== -1) {
       this.carros.splice(index, 1);
     }

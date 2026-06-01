@@ -45,7 +45,7 @@ export class ClienteRepository {
 
   // REMOÇÃO
   remove(id: number): void {
-    const index = this.clientes.findIndex((c) => c.id_cliente === id);
+    const index = this.clientes.findIndex((cliente) => cliente.id_cliente === id);
     if (index !== -1) {
       this.clientes.splice(index, 1);
     }

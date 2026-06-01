@@ -43,7 +43,7 @@ export class VendedorRepository {
 
   // REMOÇÃO
   remove(id: number): void {
-    const index = this.vendedores.findIndex((v) => v.id_vendedor === id);
+    const index = this.vendedores.findIndex((vendedor) => vendedor.id_vendedor === id);
     if (index !== -1) {
       this.vendedores.splice(index, 1);
     }
