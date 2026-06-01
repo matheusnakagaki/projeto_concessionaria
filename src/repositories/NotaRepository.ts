@@ -24,15 +24,15 @@ export class NotaRepository {
   }
 
   // FILTROS RN
-  filtraPorIdCliente(id_cliente: number): Nota[] {
+  filtraNotaPorIdCliente(id_cliente: number): Nota[] {
     return this.notas.filter((nota) => nota.id_cliente === id_cliente);
   }
 
-  filtraPorIdVendedor(id_vendedor: number): Nota[] {
+  filtraNotaPorIdVendedor(id_vendedor: number): Nota[] {
     return this.notas.filter((nota) => nota.id_vendedor === id_vendedor);
   }
 
-  filtraPorIdCarro(id_carro: number): Nota[] {
+  filtraNotaPorIdCarro(id_carro: number): Nota[] {
     return this.notas.filter((nota) => nota.id_carro === id_carro);
   }
 

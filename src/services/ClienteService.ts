@@ -44,7 +44,7 @@ export class ClienteService {
 
   removerCliente(id: number): void {
     // RN01: Não permitir remover se tiver notas vinculadas
-    const notasVinculadas = this.notaRepository.filtraPorIdCliente(id);
+    const notasVinculadas = this.notaRepository.filtraNotaPorIdCliente(id);
     if (notasVinculadas.length > 0) {
       throw new Error("Não é permitido remover cliente com notas fiscais vinculadas");
     }
