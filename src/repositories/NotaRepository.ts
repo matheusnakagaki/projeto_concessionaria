@@ -36,6 +36,9 @@ export class NotaRepository {
     return this.notas.filter((nota) => nota.id_carro === id_carro);
   }
 
+  filtraPorNumeroNota(numero_nota: string): Nota | undefined {
+    return this.notas.find((nota) => nota.numero_nota === numero_nota);
+  }
   // CADASTRO
   cadastra(nota: Nota): void {
     this.notas.push(nota);

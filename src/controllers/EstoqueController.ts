@@ -70,7 +70,7 @@ export function removerEstoque(req: Request, res: Response) {
 
 export function buscarEstoquePorIdCarro(req: Request, res: Response) {
   try {
-    const idCarro = parseInt(req.params.idCarro as string);
+    const idCarro = parseInt(req.params.id_carro as string);
     const estoque = estoqueService.buscarEstoquePorCarro(idCarro);
     
     return res.status(200).json(estoque);

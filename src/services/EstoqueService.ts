@@ -18,7 +18,8 @@ export class EstoqueService {
     if (
       !id_estoque ||
       !id_carro ||
-      !quantidade ||
+      quantidade === undefined ||
+      quantidade === null ||
       !localizacao_patio ||
       !data_entrada
     ) {

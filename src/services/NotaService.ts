@@ -64,6 +64,11 @@ export class NotaService {
       throw new Error("O valor da nota deve ser maior que zero");
     }
 
+    // Validação de Unididade da PK
+    if (this.notaRepository.filtraPorNumeroNota(numero_nota)) {
+      throw new Error("Já existe uma nota com este número");
+    }
+
     // Decrementar estoque (RN05)
     estoque.quantidade -= 1;
     this.estoqueRepository.atualiza(estoque.id_estoque, estoque);

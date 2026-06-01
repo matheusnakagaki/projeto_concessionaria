@@ -70,3 +70,8 @@ export function removerCarro(req: Request, res: Response) {
     return res.status(500).json({ mensagem: "Erro interno no servidor" });
   }
 }
+
+export function listarCarrosDisponiveis(req: Request, res: Response) {
+  const carros = carroService.listarCarrosDisponiveis();
+  return res.status(200).json(carros);
+}
