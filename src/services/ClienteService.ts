@@ -15,7 +15,14 @@ export class ClienteService {
     if (this.clienteRepository.filtraPorCpf(cpf)) {
       throw new Error("Já existe um cliente com este CPF");
     }
-    const novoCliente = new Cliente(id_cliente, nome, cpf, telefone, email, cidade);
+    const novoCliente = new Cliente(
+      id_cliente,
+      nome,
+      cpf,
+      telefone,
+      email,
+      cidade,
+    );
     this.clienteRepository.cadastra(novoCliente);
     return novoCliente;
   }
@@ -31,7 +38,7 @@ export class ClienteService {
   }
 
   atualizarCliente(id: number, dados: any): Cliente {
-    const cliente = this.buscarPorId(id); 
+    const cliente = this.buscarPorId(id);
     if (dados.nome) cliente.nome = dados.nome;
     if (dados.cpf) cliente.cpf = dados.cpf;
     if (dados.telefone) cliente.telefone = dados.telefone;
@@ -46,7 +53,9 @@ export class ClienteService {
     // RN01: Não permitir remover se tiver notas vinculadas
     const notasVinculadas = this.notaRepository.filtraNotaPorIdCliente(id);
     if (notasVinculadas.length > 0) {
-      throw new Error("Não é permitido remover cliente com notas fiscais vinculadas");
+      throw new Error(
+        "Não é permitido remover cliente com notas fiscais vinculadas",
+      );
     }
 
     this.clienteRepository.remove(id);
