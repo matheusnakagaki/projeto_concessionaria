@@ -30,7 +30,7 @@ export function listarClientes(req: Request, res: Response) {
   return res.status(200).json(clientes);
 }
 
-export function buscarPorId(req: Request, res: Response) {
+export function buscarClientePorId(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
     const cliente = clienteService.buscarPorId(id);

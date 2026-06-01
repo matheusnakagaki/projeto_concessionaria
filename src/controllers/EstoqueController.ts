@@ -32,7 +32,7 @@ export function listarEstoques(req: Request, res: Response) {
   return res.status(200).json(estoques);
 }
 
-export function buscarPorId(req: Request, res: Response) {
+export function buscarEstoquePorId(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
     const estoque = estoqueService.buscarPorId(id);
@@ -68,7 +68,7 @@ export function removerEstoque(req: Request, res: Response) {
   }
 }
 
-export function buscarPorIdCarro(req: Request, res: Response) {
+export function buscarEstoquePorIdCarro(req: Request, res: Response) {
   try {
     const idCarro = parseInt(req.params.idCarro as string);
     const estoque = estoqueService.buscarEstoquePorCarro(idCarro);

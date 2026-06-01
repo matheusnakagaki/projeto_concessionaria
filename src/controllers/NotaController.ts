@@ -40,7 +40,7 @@ export function listarNotas(req: Request, res: Response) {
   return res.status(200).json(notas);
 }
 
-export function buscarPorId(req: Request, res: Response) {
+export function buscarNotaPorId(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
     const nota = notaService.buscarPorId(id);
