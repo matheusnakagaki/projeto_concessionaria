@@ -9,8 +9,12 @@ export class ClienteService {
   cadastrarCliente(dadosCliente: any): Cliente {
     const { id_cliente, nome, cpf, telefone, email, cidade } = dadosCliente;
 
-    if (!nome || !cpf || !telefone) {
+    if (!id_cliente || !nome || !cpf || !telefone) {
       throw new Error("Informações obrigatórias incompletas");
+    }
+    // Unicidade da chave primária
+    if (this.clienteRepository.filtraPorId(id_cliente)) {
+      throw new Error("Já existe um cliente com este ID");
     }
     if (this.clienteRepository.filtraPorCpf(cpf)) {
       throw new Error("Já existe um cliente com este CPF");

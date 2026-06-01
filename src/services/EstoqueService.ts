@@ -15,8 +15,18 @@ export class EstoqueService {
       data_entrada,
     } = dadosEstoque;
 
-    if (!id_carro || quantidade === undefined || !localizacao_patio || !data_entrada) {
+    if (
+      !id_estoque ||
+      !id_carro ||
+      !quantidade ||
+      !localizacao_patio ||
+      !data_entrada
+    ) {
       throw new Error("Informações obrigatórias incompletas");
+    }
+    // Unicidade da chave primária
+    if (this.estoqueRepository.filtraPorId(id_estoque)) {
+      throw new Error("Já existe um estoque com este ID");
     }
     const carro = this.carroRepository.filtraPorId(id_carro);
     if (!carro) {
@@ -68,7 +78,8 @@ export class EstoqueService {
   atualizarEstoque(id: number, dados: any): Estoque {
     const estoque = this.buscarPorId(id);
     if (dados.quantidade !== undefined) estoque.quantidade = dados.quantidade;
-    if (dados.localizacao_patio) estoque.localizacao_patio = dados.localizacao_patio;
+    if (dados.localizacao_patio)
+      estoque.localizacao_patio = dados.localizacao_patio;
 
     this.estoqueRepository.atualiza(id, estoque);
     return estoque;

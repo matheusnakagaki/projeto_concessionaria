@@ -9,8 +9,12 @@ export class VendedorService {
   cadastrarVendedor(dadosVendedor: any): Vendedor {
     const { id_vendedor, nome, matricula, comissao_percentual } = dadosVendedor;
 
-    if (!nome || !matricula || !comissao_percentual) {
+    if (!id_vendedor || !nome || !matricula || !comissao_percentual) {
       throw new Error("Informações obrigatórias incompletas");
+    }
+    // Unicidade da chave primária
+    if (this.vendedorRepository.filtraPorId(id_vendedor)) {
+      throw new Error("Já existe um vendedor com este ID");
     }
     if (this.vendedorRepository.filtraPorMatricula(matricula)) {
       throw new Error("Já existe um vendedor com esta Matrícula");

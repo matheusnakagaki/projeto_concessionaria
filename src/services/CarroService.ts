@@ -11,8 +11,12 @@ export class CarroService {
   cadastrarCarro(dadosCarro: any): Carro {
     const { id_carro, marca, modelo, ano, placa, preco, cor } = dadosCarro;
 
-    if (!marca || !modelo || !ano || !placa || !preco || !cor) {
+    if (!id_carro || !marca || !modelo || !ano || !placa || !preco || !cor) {
       throw new Error("Informações obrigatórias incompletas");
+    }
+    // Unicidade da chave primária
+    if (this.carroRepository.filtraPorId(id_carro)) {
+      throw new Error("Já existe um carro com este ID");
     }
     if (this.carroRepository.filtraPorPlaca(placa)) {
       throw new Error("Já existe um carro com esta Placa");
@@ -78,3 +82,6 @@ export class CarroService {
     this.carroRepository.remove(id);
   }
 }
+
+
+// implementar listagem de carros com estoque > 0
