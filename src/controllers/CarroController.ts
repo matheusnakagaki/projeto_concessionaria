@@ -8,7 +8,7 @@ export function cadastrarCarro(req: Request, res: Response) {
     const novoCarro = carroService.cadastrarCarro(req.body);
     res.status(201).json({
       mensagem: "Carro cadastrado com sucesso!",
-      cliente: novoCarro,
+      carro: novoCarro,
     });
   } catch (error: any) {
     const mensagem = error.message;
