@@ -28,14 +28,11 @@ export class VendedorRepository {
     this.vendedores.push(vendedor);
   }
 
-  // ATUALIZAÇÃO 
-  atualiza(id: number, dadosNovos: any): boolean {
-    const vendedor = this.filtraPorId(id);
-
-    if (vendedor) {
-      if (dadosNovos.nome) vendedor.nome = dadosNovos.nome;
-      if (dadosNovos.matricula) vendedor.matricula = dadosNovos.matricula;
-      if (dadosNovos.comissao_percentual) vendedor.comissao_percentual = dadosNovos.comissao_percentual;
+  // ATUALIZAÇÃO
+  atualiza(id: number, vendedorAtualizado: Vendedor): boolean {
+    const index = this.vendedores.findIndex((vendedor) => vendedor.id_vendedor === id);
+    if (index !== -1) {
+      this.vendedores[index] = vendedorAtualizado;
       return true;
     }
     return false;
@@ -43,7 +40,9 @@ export class VendedorRepository {
 
   // REMOÇÃO
   remove(id: number): void {
-    const index = this.vendedores.findIndex((vendedor) => vendedor.id_vendedor === id);
+    const index = this.vendedores.findIndex(
+      (vendedor) => vendedor.id_vendedor === id,
+    );
     if (index !== -1) {
       this.vendedores.splice(index, 1);
     }

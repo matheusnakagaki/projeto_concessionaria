@@ -23,9 +23,11 @@ export class EstoqueRepository {
     return this.estoqueCompleto.find((estoque) => estoque.id_estoque === id);
   }
 
-  // BUSCA POR ID DO CARRO 
+  // BUSCA POR ID DO CARRO
   filtraPorIdCarro(id_carro: number): Estoque | undefined {
-    return this.estoqueCompleto.find((estoque) => estoque.id_carro === id_carro);
+    return this.estoqueCompleto.find(
+      (estoque) => estoque.id_carro === id_carro,
+    );
   }
 
   // CADASTRO
@@ -33,13 +35,11 @@ export class EstoqueRepository {
     this.estoqueCompleto.push(estoque);
   }
 
-  // ATUALIZAÇÃO 
-  atualiza(id: number, dadosNovos: any): boolean {
-    const estoque = this.filtraPorId(id);
-
-    if (estoque) {
-      if (dadosNovos.quantidade !== undefined) estoque.quantidade = dadosNovos.quantidade;
-      if (dadosNovos.localizacao_patio) estoque.localizacao_patio = dadosNovos.localizacao_patio;
+  // ATUALIZAÇÃO
+  atualiza(id: number, estoqueAtualizado: Estoque): boolean {
+    const index = this.estoqueCompleto.findIndex((estoque) => estoque.id_estoque === id);
+    if (index !== -1) {
+      this.estoqueCompleto[index] = estoqueAtualizado;
       return true;
     }
     return false;

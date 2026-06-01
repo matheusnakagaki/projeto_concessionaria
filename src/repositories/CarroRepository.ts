@@ -29,16 +29,10 @@ export class CarroRepository {
   }
 
   // ATUALIZAÇÃO
-  atualiza(id: number, dadosNovos: any): boolean {
-    const carro = this.filtraPorId(id);
-
-    if (carro) {
-      if (dadosNovos.marca) carro.marca = dadosNovos.marca;
-      if (dadosNovos.modelo) carro.modelo = dadosNovos.modelo;
-      if (dadosNovos.ano) carro.ano = dadosNovos.ano;
-      if (dadosNovos.placa) carro.placa = dadosNovos.placa;
-      if (dadosNovos.preco) carro.preco = dadosNovos.preco;
-      if (dadosNovos.cor) carro.cor = dadosNovos.cor;
+  atualiza(id: number, carroAtualizado: Carro): boolean {
+    const index = this.carros.findIndex((carro) => carro.id_carro === id);
+    if (index !== -1) {
+      this.carros[index] = carroAtualizado;
       return true;
     }
     return false;

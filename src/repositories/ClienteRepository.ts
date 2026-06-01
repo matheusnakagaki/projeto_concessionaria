@@ -28,16 +28,11 @@ export class ClienteRepository {
     this.clientes.push(cliente);
   }
 
-  // ATUALIZAÇÃO 
-  atualiza(id: number, dadosNovos: any): boolean {
-    const cliente = this.filtraPorId(id);
-
-    if (cliente) {
-      if (dadosNovos.nome) cliente.nome = dadosNovos.nome;
-      if (dadosNovos.cpf) cliente.cpf = dadosNovos.cpf;
-      if (dadosNovos.telefone) cliente.telefone = dadosNovos.telefone;
-      if (dadosNovos.email) cliente.email = dadosNovos.email;
-      if (dadosNovos.cidade) cliente.cidade = dadosNovos.cidade;
+  // ATUALIZAÇÃO
+  atualiza(id: number, clienteAtualizado: Cliente): boolean {
+    const index = this.clientes.findIndex((cliente) => cliente.id_cliente === id);
+    if (index !== -1) {
+      this.clientes[index] = clienteAtualizado;
       return true;
     }
     return false;
@@ -45,7 +40,9 @@ export class ClienteRepository {
 
   // REMOÇÃO
   remove(id: number): void {
-    const index = this.clientes.findIndex((cliente) => cliente.id_cliente === id);
+    const index = this.clientes.findIndex(
+      (cliente) => cliente.id_cliente === id,
+    );
     if (index !== -1) {
       this.clientes.splice(index, 1);
     }
