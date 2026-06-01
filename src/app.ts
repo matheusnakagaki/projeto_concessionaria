@@ -51,3 +51,5 @@ app.delete("/api/estoque/:id", removerEstoque);
 app.get("/api/notas", listarNotas);
 app.get("/api/notas/:id", buscarNotaPorId);
 app.post("/api/notas", cadastrarNota);
+
+app.listen(PORT, logInfo);
