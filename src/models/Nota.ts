@@ -1,4 +1,4 @@
-export class NotaFiscal {
+export class Nota {
     id_nota: number;
     numero_nota: string;
     data_emissao: Date;
