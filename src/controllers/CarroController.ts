@@ -20,6 +20,14 @@ export function cadastrarCarro(req: Request, res: Response) {
     if (mensagem.includes("Já existe")) {
       return res.status(409).json({ mensagem: error.message });
     }
+
+    if (mensagem.includes("Ano não permitido")) {
+      return res.status(400).json({ mensagem: error.message });
+    }
+
+    if (mensagem.includes("O valor do carro")) {
+      return res.status(400).json({ mensagem: error.message });
+    }
   }
 }
 

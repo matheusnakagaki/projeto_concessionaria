@@ -22,6 +22,11 @@ export function cadastrarVendedor(req: Request, res: Response) {
     if (mensagem.includes("Já existe")) {
       return res.status(409).json({ mensagem: error.message });
     }
+
+    if (mensagem.includes("Percentual de Comissão")) {
+      return res.status(400).json({ mensagem: error.message });
+    }
+
   }
 }
 
