@@ -11,19 +11,15 @@ export function cadastrarCarro(req: Request, res: Response) {
     });
   } catch (error: any) {
     const mensagem = error.message;
-
     if (mensagem === "Informações obrigatórias incompletas") {
       return res.status(400).json({ mensagem: error.message });
     }
-
     if (mensagem.includes("Já existe")) {
       return res.status(409).json({ mensagem: error.message });
     }
-
     if (mensagem.includes("Ano não permitido")) {
       return res.status(400).json({ mensagem: error.message });
     }
-
     if (mensagem.includes("O valor do carro")) {
       return res.status(400).json({ mensagem: error.message });
     }
@@ -32,12 +28,10 @@ export function cadastrarCarro(req: Request, res: Response) {
 
 export function listarCarros(req: Request, res: Response) {
   const disponivel = req.query.disponivel;
-
   if (disponivel === "true") {
     const carrosDisponiveis = carroService.listarCarrosDisponiveis();
     return res.status(200).json(carrosDisponiveis);
   }
-
   const todos = carroService.listarCarros();
   return res.status(200).json(todos);
 }

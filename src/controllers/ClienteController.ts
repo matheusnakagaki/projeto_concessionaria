@@ -8,17 +8,19 @@ const notaRepository = NotaRepository.getInstance();
 export function cadastrarCliente(req: Request, res: Response) {
   try {
     const novoCliente = clienteService.cadastrarCliente(req.body);
-    res.status(201).json({
-      cliente: novoCliente,
-    });
+    return res.status(201).json(novoCliente);
   } catch (error: any) {
     const mensagem = error.message;
+
     if (mensagem === "Informações obrigatórias incompletas") {
-      return res.status(400).json({ mensagem: error.message });
+      return res.status(400).json({ mensagem });
     }
+
     if (mensagem.includes("Já existe")) {
-      return res.status(409).json({ mensagem: error.message });
+      return res.status(409).json({ mensagem });
     }
+
+    return res.status(400).json({ mensagem });
   }
 }
 
@@ -82,8 +84,6 @@ export function listarNotasDoCliente(req: Request, res: Response) {
     const notas = notaRepository.filtraNotaPorIdCliente(id);
     return res.status(200).json(notas);
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({ mensagem: "Erro ao buscar notas do cliente" });
+    return res.status(404).json({ mensagem: error.message });
   }
 }

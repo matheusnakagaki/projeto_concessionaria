@@ -11,26 +11,27 @@ export function cadastrarNota(req: Request, res: Response) {
     });
   } catch (error: any) {
     const mensagem = error.message;
-
-    if (mensagem === "Informações obrigatórias incompletas" || 
-        mensagem === "Data de emissão não pode ser futura" || 
-        mensagem === "O valor da nota deve ser maior que zero") {
+    if (
+      mensagem === "Informações obrigatórias incompletas" ||
+      mensagem === "Data de emissão não pode ser futura" ||
+      mensagem === "O valor da nota deve ser maior que zero"
+    ) {
       return res.status(400).json({ mensagem });
     }
-
-    if (mensagem.includes("não encontrado")) {
+    if (
+      mensagem === "Cliente não encontrado" ||
+      mensagem === "Vendedor não encontrado" ||
+      mensagem === "Carro não encontrado"
+    ) {
       return res.status(404).json({ mensagem });
     }
-
     if (mensagem.includes("Já existe")) {
       return res.status(409).json({ mensagem });
     }
-
     if (mensagem === "Carro indisponível em estoque") {
       return res.status(422).json({ mensagem });
     }
-
-    return res.status(500).json({ mensagem: "Erro interno no servidor" });
+    return res.status(400).json({ mensagem });
   }
 }
 

@@ -13,19 +13,15 @@ export function cadastrarVendedor(req: Request, res: Response) {
     });
   } catch (error: any) {
     const mensagem = error.message;
-
     if (mensagem === "Informações obrigatórias incompletas") {
       return res.status(400).json({ mensagem: error.message });
     }
-
     if (mensagem.includes("Já existe")) {
       return res.status(409).json({ mensagem: error.message });
     }
-
     if (mensagem.includes("Percentual de Comissão")) {
       return res.status(400).json({ mensagem: error.message });
     }
-
     return res.status(400).json({ mensagem });
   }
 }
@@ -96,8 +92,6 @@ export function listarNotasDoVendedor(req: Request, res: Response) {
     const notas = notaRepository.filtraNotaPorIdVendedor(id);
     return res.status(200).json(notas);
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({ mensagem: "Erro ao buscar notas do vendedor" });
+    return res.status(404).json({ mensagem: error.message });
   }
 }
