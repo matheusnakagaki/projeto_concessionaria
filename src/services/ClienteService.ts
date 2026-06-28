@@ -7,18 +7,18 @@ export class ClienteService {
   notaRepository: NotaRepository = NotaRepository.getInstance();
 
   cadastrarCliente(dadosCliente: any): Cliente {
-    const { id_cliente, nome, cpf, telefone, email, cidade } = dadosCliente;
+    const { nome, cpf, telefone, email, cidade } = dadosCliente;
 
-    if (!id_cliente || !nome || !cpf || !telefone) {
+    if ( !nome || !cpf || !telefone) {
       throw new Error("Informações obrigatórias incompletas");
     }
-    // Unicidade da chave primária
-    if (this.clienteRepository.filtraPorId(id_cliente)) {
-      throw new Error("Já existe um cliente com este ID");
-    }
+
     if (this.clienteRepository.filtraPorCpf(cpf)) {
       throw new Error("Já existe um cliente com este CPF");
     }
+    
+    const id_cliente = this.clienteRepository.gerarProximoId();
+
     const novoCliente = new Cliente(
       id_cliente,
       nome,

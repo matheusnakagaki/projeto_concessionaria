@@ -9,7 +9,6 @@ export function cadastrarCliente(req: Request, res: Response) {
   try {
     const novoCliente = clienteService.cadastrarCliente(req.body);
     res.status(201).json({
-      mensagem: "Cliente cadastrado com sucesso!",
       cliente: novoCliente,
     });
   } catch (error: any) {
@@ -46,7 +45,8 @@ export function atualizarCliente(req: Request, res: Response) {
     const clienteAtualizado = clienteService.atualizarCliente(id, req.body);
     return res.status(200).json(clienteAtualizado);
   } catch (error: any) {
-    if (error.message === "Cliente não encontrado") return res.status(404).json({ mensagem: error.message });
+    if (error.message === "Cliente não encontrado")
+      return res.status(404).json({ mensagem: error.message });
     return res.status(400).json({ mensagem: error.message });
   }
 }
@@ -57,8 +57,10 @@ export function removerCliente(req: Request, res: Response) {
     clienteService.removerCliente(id);
     return res.status(200).json({ mensagem: "Cliente removido com sucesso!" });
   } catch (error: any) {
-    if (error.message.includes("Não é permitido remover")) return res.status(422).json({ mensagem: error.message });
-    if (error.message === "Cliente não encontrado") return res.status(404).json({ mensagem: error.message });
+    if (error.message.includes("Não é permitido remover"))
+      return res.status(422).json({ mensagem: error.message });
+    if (error.message === "Cliente não encontrado")
+      return res.status(404).json({ mensagem: error.message });
     return res.status(500).json({ mensagem: "Erro interno no servidor" });
   }
 }
@@ -69,6 +71,8 @@ export function listarNotasDoCliente(req: Request, res: Response) {
     const notas = notaRepository.filtraNotaPorIdCliente(id);
     return res.status(200).json(notas);
   } catch (error: any) {
-    return res.status(500).json({ mensagem: "Erro ao buscar notas do cliente" });
+    return res
+      .status(500)
+      .json({ mensagem: "Erro ao buscar notas do cliente" });
   }
 }
