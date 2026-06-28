@@ -58,9 +58,25 @@ export function atualizarCarro(req: Request, res: Response) {
     const carroAtualizado = carroService.atualizarCarro(id, req.body);
     return res.status(200).json(carroAtualizado);
   } catch (error: any) {
-    if (error.message === "Carro não encontrado")
-      return res.status(404).json({ mensagem: error.message });
-    return res.status(400).json({ mensagem: error.message });
+    const mensagem = error.message;
+
+    if (mensagem === "Carro não encontrado") {
+      return res.status(404).json({ mensagem });
+    }
+    if (mensagem === "Informações obrigatórias incompletas") {
+      return res.status(400).json({ mensagem });
+    }
+    if (mensagem.includes("Já existe")) {
+      return res.status(409).json({ mensagem });
+    }
+    if (
+      mensagem.includes("Ano") ||
+      mensagem.includes("Preço") ||
+      mensagem.includes("preço")
+    ) {
+      return res.status(400).json({ mensagem });
+    }
+    return res.status(400).json({ mensagem });
   }
 }
 

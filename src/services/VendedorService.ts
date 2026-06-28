@@ -46,14 +46,45 @@ export class VendedorService {
   }
 
   atualizarVendedor(id: number, dados: any): Vendedor {
-    const vendedor = this.buscarPorId(id);
-    if (dados.nome) vendedor.nome = dados.nome;
-    if (dados.matricula) vendedor.matricula = dados.matricula;
-    if (dados.comissao_percentual !== undefined) {
-      vendedor.comissao_percentual = dados.comissao_percentual;
+    const vendedorExistente = this.vendedorRepository.filtraPorId(id);
+
+    if (!vendedorExistente) {
+      throw new Error("Vendedor não encontrado");
     }
-    this.vendedorRepository.atualiza(id, vendedor);
-    return vendedor;
+    const nome = dados.nome !== undefined ? dados.nome : vendedorExistente.nome;
+    const matricula =
+      dados.matricula !== undefined
+        ? dados.matricula
+        : vendedorExistente.matricula;
+    const comissao_percentual =
+      dados.comissao_percentual !== undefined
+        ? dados.comissao_percentual
+        : vendedorExistente.comissao_percentual;
+    if (!nome || !matricula || comissao_percentual === undefined) {
+      throw new Error("Informações obrigatórias incompletas");
+    }
+    const vendedorComMesmaMatricula =
+      this.vendedorRepository.filtraPorMatricula(matricula);
+    if (
+      vendedorComMesmaMatricula &&
+      vendedorComMesmaMatricula.id_vendedor !== id
+    ) {
+      throw new Error("Já existe um vendedor com esta matrícula");
+    }
+    if (comissao_percentual < 0 || comissao_percentual > 30) {
+      throw new Error("Comissão percentual deve estar entre 0 e 30");
+    }
+
+    const vendedorAtualizado = new Vendedor(
+      id,
+      nome,
+      matricula,
+      comissao_percentual,
+    );
+
+    this.vendedorRepository.atualiza(id, vendedorAtualizado);
+
+    return vendedorAtualizado;
   }
 
   removerVendedor(id: number): void {

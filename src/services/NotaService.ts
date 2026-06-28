@@ -1,4 +1,5 @@
 import { Nota } from "../models/Nota";
+import { Estoque } from "../models/Estoque"
 import { NotaRepository } from "../repositories/NotaRepository";
 import { EstoqueRepository } from "../repositories/EstoqueRepository";
 import { CarroRepository } from "../repositories/CarroRepository";
@@ -14,7 +15,6 @@ export class NotaService {
 
   cadastrarNota(dadosNota: any): Nota {
     const {
-      id_nota,
       numero_nota,
       data_emissao,
       valor_total,
@@ -24,20 +24,14 @@ export class NotaService {
     } = dadosNota;
 
     if (
-      !id_nota ||
       !numero_nota ||
       !data_emissao ||
-      !valor_total ||
-      !id_cliente ||
-      !id_vendedor ||
-      !id_carro
+      valor_total === undefined ||
+      id_cliente === undefined ||
+      id_vendedor === undefined ||
+      id_carro === undefined
     ) {
       throw new Error("Informações obrigatórias incompletas");
-    }
-
-    // Unicidade da chave primária
-    if (this.notaRepository.filtraPorId(id_nota)) {
-      throw new Error("Já existe uma nota fiscal com este ID");
     }
 
     // Validações de existência (RN05)
@@ -49,13 +43,16 @@ export class NotaService {
       throw new Error("Carro não encontrado");
 
     // Validação de Estoque (RN05)
-    const estoque = this.estoqueRepository.filtraPorIdCarro(id_carro);
+    const estoque = this.estoqueRepository.filtraPorIdCarro(Number(id_carro));
     if (!estoque || estoque.quantidade <= 0) {
       throw new Error("Carro indisponível em estoque");
     }
 
     // Validação de Data (RN05)
-    if (new Date(data_emissao) > new Date()) {
+    const dataEmissao = new Date(data_emissao);
+    const hoje = new Date();
+
+    if (dataEmissao > hoje) {
       throw new Error("Data de emissão não pode ser futura");
     }
 
@@ -69,9 +66,7 @@ export class NotaService {
       throw new Error("Já existe uma nota com este número");
     }
 
-    // Decrementar estoque (RN05)
-    estoque.quantidade -= 1;
-    this.estoqueRepository.atualiza(estoque.id_estoque, estoque);
+    const id_nota = this.notaRepository.gerarProximoId();
 
     const novaNota = new Nota(
       id_nota,
@@ -83,6 +78,17 @@ export class NotaService {
       id_carro,
     );
     this.notaRepository.cadastra(novaNota);
+
+    // Decrementar estoque (RN05)
+    const estoqueAtualizado = new Estoque(
+      estoque.id_estoque,
+      estoque.id_carro,
+      estoque.quantidade - 1,
+      estoque.localizacao_patio,
+      estoque.data_entrada,
+    );
+
+    this.estoqueRepository.atualiza(estoque.id_estoque, estoqueAtualizado);
 
     return novaNota;
   }

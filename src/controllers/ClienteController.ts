@@ -45,9 +45,18 @@ export function atualizarCliente(req: Request, res: Response) {
     const clienteAtualizado = clienteService.atualizarCliente(id, req.body);
     return res.status(200).json(clienteAtualizado);
   } catch (error: any) {
-    if (error.message === "Cliente não encontrado")
-      return res.status(404).json({ mensagem: error.message });
-    return res.status(400).json({ mensagem: error.message });
+    const mensagem = error.message;
+
+    if (mensagem === "Cliente não encontrado") {
+      return res.status(404).json({ mensagem });
+    }
+    if (mensagem === "Informações obrigatórias incompletas") {
+      return res.status(400).json({ mensagem });
+    }
+    if (mensagem.includes("Já existe")) {
+      return res.status(409).json({ mensagem });
+    }
+    return res.status(400).json({ mensagem });
   }
 }
 

@@ -51,18 +51,56 @@ export class CarroService {
     return carro;
   }
 
-  atualizarCarro(id: number, dados: any): Carro {
-    const carro = this.buscarPorId(id);
-    if (dados.marca) carro.marca = dados.marca;
-    if (dados.modelo) carro.modelo = dados.modelo;
-    if (dados.ano) carro.ano = dados.ano;
-    if (dados.placa) carro.placa = dados.placa;
-    if (dados.preco) carro.preco = dados.preco;
-    if (dados.cor) carro.cor = dados.cor;
-
-    this.carroRepository.atualiza(id, carro);
-    return carro;
+atualizarCarro(id: number, dados: any): Carro {
+  const carroExistente = this.carroRepository.filtraPorId(id);
+  if (!carroExistente) {
+    throw new Error("Carro não encontrado");
   }
+
+  const marca =
+    dados.marca !== undefined ? dados.marca : carroExistente.marca;
+  const modelo =
+    dados.modelo !== undefined ? dados.modelo : carroExistente.modelo;
+  const ano =
+    dados.ano !== undefined ? Number(dados.ano) : carroExistente.ano;
+  const placa =
+    dados.placa !== undefined ? dados.placa : carroExistente.placa;
+  const preco =
+    dados.preco !== undefined ? Number(dados.preco) : carroExistente.preco;
+  const cor =
+    dados.cor !== undefined ? dados.cor : carroExistente.cor;
+
+  if (!marca || !modelo || !ano || !placa || preco === undefined || !cor) {
+    throw new Error("Informações obrigatórias incompletas");
+  }
+
+  const carroComMesmaPlaca = this.carroRepository.filtraPorPlaca(placa);
+  if (carroComMesmaPlaca && carroComMesmaPlaca.id_carro !== id) {
+    throw new Error("Já existe um carro com esta placa");
+  }
+
+  const anoAtual = new Date().getFullYear();
+  if (!Number.isInteger(ano) || ano < 1950 || ano > anoAtual + 1) {
+    throw new Error("Ano inválido");
+  }
+  if (preco <= 0) {
+    throw new Error("Preço deve ser maior que zero");
+  }
+
+  const carroAtualizado = new Carro(
+    id,
+    marca,
+    modelo,
+    ano,
+    placa,
+    preco,
+    cor
+  );
+
+  this.carroRepository.atualiza(id, carroAtualizado);
+
+  return carroAtualizado;
+}
 
   removerCarro(id: number): void {
     // RN03: Não permitir remover se tiver notas vinculadas

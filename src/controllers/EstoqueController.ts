@@ -45,11 +45,25 @@ export function atualizarEstoque(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
     const estoqueAtualizado = estoqueService.atualizarEstoque(id, req.body);
+
     return res.status(200).json(estoqueAtualizado);
   } catch (error: any) {
-    if (error.message === "Estoque não encontrado")
-      return res.status(404).json({ mensagem: error.message });
-    return res.status(400).json({ mensagem: error.message });
+    const mensagem = error.message;
+
+    if (mensagem === "Estoque não encontrado") {
+      return res.status(404).json({ mensagem });
+    }
+    if (mensagem === "Informações obrigatórias incompletas") {
+      return res.status(400).json({ mensagem });
+    }
+    if (mensagem.includes("Quantidade")) {
+      return res.status(400).json({ mensagem });
+    }
+    if (mensagem.includes("Data")) {
+      return res.status(400).json({ mensagem });
+    }
+
+    return res.status(400).json({ mensagem });
   }
 }
 
@@ -71,7 +85,7 @@ export function buscarEstoquePorIdCarro(req: Request, res: Response) {
   try {
     const idCarro = parseInt(req.params.id_carro as string);
     const estoque = estoqueService.buscarEstoquePorCarro(idCarro);
-    
+
     return res.status(200).json(estoque);
   } catch (error: any) {
     return res.status(404).json({ mensagem: error.message });

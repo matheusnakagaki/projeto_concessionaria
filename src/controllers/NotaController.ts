@@ -7,7 +7,6 @@ export function cadastrarNota(req: Request, res: Response) {
   try {
     const novaNota = notaService.cadastrarNota(req.body);
     res.status(201).json({
-      mensagem: "Nota fiscal emitida com sucesso!",
       nota: novaNota,
     });
   } catch (error: any) {

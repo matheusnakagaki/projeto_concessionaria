@@ -25,7 +25,7 @@ export function cadastrarVendedor(req: Request, res: Response) {
     if (mensagem.includes("Percentual de Comissão")) {
       return res.status(400).json({ mensagem: error.message });
     }
-    
+
     return res.status(400).json({ mensagem });
   }
 }
@@ -49,11 +49,25 @@ export function atualizarVendedor(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
     const vendedorAtualizado = vendedorService.atualizarVendedor(id, req.body);
+
     return res.status(200).json(vendedorAtualizado);
   } catch (error: any) {
-    if (error.message === "Vendedor não encontrado")
-      return res.status(404).json({ mensagem: error.message });
-    return res.status(400).json({ mensagem: error.message });
+    const mensagem = error.message;
+
+    if (mensagem === "Vendedor não encontrado") {
+      return res.status(404).json({ mensagem });
+    }
+    if (mensagem === "Informações obrigatórias incompletas") {
+      return res.status(400).json({ mensagem });
+    }
+    if (mensagem.includes("Já existe")) {
+      return res.status(409).json({ mensagem });
+    }
+    if (mensagem.includes("Comissão") || mensagem.includes("comissão")) {
+      return res.status(400).json({ mensagem });
+    }
+
+    return res.status(400).json({ mensagem });
   }
 }
 

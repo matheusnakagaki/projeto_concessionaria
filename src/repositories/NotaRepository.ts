@@ -3,6 +3,7 @@ import { Nota } from "../models/Nota";
 export class NotaRepository {
   private static instance: NotaRepository;
   private notas: Nota[] = [];
+  private proximoId: number = 1;
 
   private constructor() {}
 
@@ -11,6 +12,10 @@ export class NotaRepository {
       this.instance = new NotaRepository();
     }
     return this.instance;
+  }
+
+  gerarProximoId(): number {
+    return this.proximoId++;
   }
 
   // LISTAGEM
