@@ -3,6 +3,7 @@ import { Cliente } from "../models/Cliente";
 export class ClienteRepository {
   private static instance: ClienteRepository;
   private clientes: Cliente[] = [];
+  private proximoId: number = 1;
 
   private constructor() {}
 
@@ -11,6 +12,10 @@ export class ClienteRepository {
       this.instance = new ClienteRepository();
     }
     return this.instance;
+  }
+
+  gerarProximoId(): number {
+    return this.proximoId++;
   }
 
   // LISTAGEM
@@ -30,7 +35,9 @@ export class ClienteRepository {
 
   // ATUALIZAÇÃO
   atualiza(id: number, clienteAtualizado: Cliente): boolean {
-    const index = this.clientes.findIndex((cliente) => cliente.id_cliente === id);
+    const index = this.clientes.findIndex(
+      (cliente) => cliente.id_cliente === id,
+    );
     if (index !== -1) {
       this.clientes[index] = clienteAtualizado;
       return true;
