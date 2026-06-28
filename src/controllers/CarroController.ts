@@ -84,13 +84,18 @@ export function removerCarro(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
     carroService.removerCarro(id);
-    return res.status(200).json({ mensagem: "Carro removido com sucesso!" });
+    return res.status(200).json({
+      mensagem: "Carro removido com sucesso!",
+    });
   } catch (error: any) {
-    if (error.message.includes("Não é permitido remover"))
-      return res.status(422).json({ mensagem: error.message });
-    if (error.message === "Carro não encontrado")
-      return res.status(404).json({ mensagem: error.message });
-    return res.status(500).json({ mensagem: "Erro interno no servidor" });
+    const mensagem = error.message;
+    if (mensagem === "Carro não encontrado") {
+      return res.status(404).json({ mensagem });
+    }
+    if (mensagem.includes("Não é permitido remover")) {
+      return res.status(422).json({ mensagem });
+    }
+    return res.status(400).json({ mensagem });
   }
 }
 

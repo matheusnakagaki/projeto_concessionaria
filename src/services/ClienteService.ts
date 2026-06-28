@@ -80,15 +80,19 @@ export class ClienteService {
     return clienteAtualizado;
   }
 
+  // RN01: Não permitir remover se tiver notas vinculadas
   removerCliente(id: number): void {
-    // RN01: Não permitir remover se tiver notas vinculadas
-    const notasVinculadas = this.notaRepository.filtraNotaPorIdCliente(id);
-    if (notasVinculadas.length > 0) {
-      throw new Error(
-        "Não é permitido remover cliente com notas fiscais vinculadas",
-      );
+    const cliente = this.clienteRepository.filtraPorId(id);
+    if (!cliente) {
+      throw new Error("Cliente não encontrado");
     }
 
+    const notasDoCliente = this.notaRepository.filtraNotaPorIdCliente(id);
+    if (notasDoCliente.length > 0) {
+      throw new Error(
+        "Não é permitido remover cliente que possui notas fiscais vinculadas",
+      );
+    }
     this.clienteRepository.remove(id);
   }
 }

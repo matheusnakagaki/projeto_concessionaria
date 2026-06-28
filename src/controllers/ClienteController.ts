@@ -13,11 +13,9 @@ export function cadastrarCliente(req: Request, res: Response) {
     });
   } catch (error: any) {
     const mensagem = error.message;
-
     if (mensagem === "Informações obrigatórias incompletas") {
       return res.status(400).json({ mensagem: error.message });
     }
-
     if (mensagem.includes("Já existe")) {
       return res.status(409).json({ mensagem: error.message });
     }
@@ -46,7 +44,6 @@ export function atualizarCliente(req: Request, res: Response) {
     return res.status(200).json(clienteAtualizado);
   } catch (error: any) {
     const mensagem = error.message;
-
     if (mensagem === "Cliente não encontrado") {
       return res.status(404).json({ mensagem });
     }
@@ -64,13 +61,18 @@ export function removerCliente(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
     clienteService.removerCliente(id);
-    return res.status(200).json({ mensagem: "Cliente removido com sucesso!" });
+    return res.status(200).json({
+      mensagem: "Cliente removido com sucesso!",
+    });
   } catch (error: any) {
-    if (error.message.includes("Não é permitido remover"))
-      return res.status(422).json({ mensagem: error.message });
-    if (error.message === "Cliente não encontrado")
-      return res.status(404).json({ mensagem: error.message });
-    return res.status(500).json({ mensagem: "Erro interno no servidor" });
+    const mensagem = error.message;
+    if (mensagem === "Cliente não encontrado") {
+      return res.status(404).json({ mensagem });
+    }
+    if (mensagem.includes("Não é permitido remover")) {
+      return res.status(422).json({ mensagem });
+    }
+    return res.status(400).json({ mensagem });
   }
 }
 

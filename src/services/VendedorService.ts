@@ -74,28 +74,28 @@ export class VendedorService {
     if (comissao_percentual < 0 || comissao_percentual > 30) {
       throw new Error("Comissão percentual deve estar entre 0 e 30");
     }
-
     const vendedorAtualizado = new Vendedor(
       id,
       nome,
       matricula,
       comissao_percentual,
     );
-
     this.vendedorRepository.atualiza(id, vendedorAtualizado);
-
     return vendedorAtualizado;
   }
 
+  // RN02: Não permitir remover se tiver notas vinculadas
   removerVendedor(id: number): void {
-    // RN02: Não permitir remover se tiver notas vinculadas
-    const notasVinculadas = this.notaRepository.filtraNotaPorIdVendedor(id);
-    if (notasVinculadas.length > 0) {
+    const vendedor = this.vendedorRepository.filtraPorId(id);
+    if (!vendedor) {
+      throw new Error("Vendedor não encontrado");
+    }
+    const notasDoVendedor = this.notaRepository.filtraNotaPorIdVendedor(id);
+    if (notasDoVendedor.length > 0) {
       throw new Error(
-        "Não é permitido remover vendedor com notas fiscais vinculadas",
+        "Não é permitido remover vendedor que possui notas fiscais vinculadas",
       );
     }
-
     this.vendedorRepository.remove(id);
   }
 }
