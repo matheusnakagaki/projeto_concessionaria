@@ -3,6 +3,7 @@ import { Carro } from "../models/Carro";
 export class CarroRepository {
   private static instance: CarroRepository;
   private carros: Carro[] = [];
+  private proximoId: number = 1;
 
   private constructor() {}
 
@@ -11,6 +12,10 @@ export class CarroRepository {
       this.instance = new CarroRepository();
     }
     return this.instance;
+  }
+
+  gerarProximoId(): number {
+    return this.proximoId++;
   }
 
   // LISTAGEM

@@ -7,15 +7,13 @@ export class VendedorService {
   notaRepository: NotaRepository = NotaRepository.getInstance();
 
   cadastrarVendedor(dadosVendedor: any): Vendedor {
-    const { id_vendedor, nome, matricula, comissao_percentual } = dadosVendedor;
+    const { nome, matricula, comissao_percentual } = dadosVendedor;
 
-    if (!id_vendedor || !nome || !matricula || !comissao_percentual) {
+    if (!nome || !matricula || comissao_percentual === undefined) {
       throw new Error("Informações obrigatórias incompletas");
     }
     // Unicidade da chave primária
-    if (this.vendedorRepository.filtraPorId(id_vendedor)) {
-      throw new Error("Já existe um vendedor com este ID");
-    }
+
     if (this.vendedorRepository.filtraPorMatricula(matricula)) {
       throw new Error("Já existe um vendedor com esta Matrícula");
     }
@@ -24,6 +22,9 @@ export class VendedorService {
         "Percentual de Comissão deve ser maior que 0 e menor que 30",
       );
     }
+
+    const id_vendedor = this.vendedorRepository.gerarProximoId();
+
     const novoVendedor = new Vendedor(
       id_vendedor,
       nome,

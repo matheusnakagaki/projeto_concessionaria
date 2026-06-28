@@ -9,25 +9,25 @@ export class CarroService {
   estoqueRepository: EstoqueRepository = EstoqueRepository.getInstance();
 
   cadastrarCarro(dadosCarro: any): Carro {
-    const { id_carro, marca, modelo, ano, placa, preco, cor } = dadosCarro;
+    const { marca, modelo, ano, placa, preco, cor } = dadosCarro;
 
-    if (!id_carro || !marca || !modelo || !ano || !placa || !preco || !cor) {
+    if (!marca || !modelo || !ano || !placa || preco === undefined || !cor) {
       throw new Error("Informações obrigatórias incompletas");
     }
     // Unicidade da chave primária
-    if (this.carroRepository.filtraPorId(id_carro)) {
-      throw new Error("Já existe um carro com este ID");
-    }
     if (this.carroRepository.filtraPorPlaca(placa)) {
       throw new Error("Já existe um carro com esta Placa");
     }
-    const currentYear = new Date().getFullYear();
-    if (ano < 1950 || ano > currentYear + 1) {
+    const anoAtual = new Date().getFullYear();
+    if (ano < 1950 || ano > anoAtual + 1) {
       throw new Error("Ano não permitido");
     }
     if (preco === undefined || preco <= 0) {
       throw new Error("O valor do carro deve ser maior que zero");
     }
+
+    const id_carro = this.carroRepository.gerarProximoId();
+
     const novoCarro = new Carro(
       id_carro,
       marca,
@@ -81,7 +81,7 @@ export class CarroService {
     }
     this.carroRepository.remove(id);
   }
-  
+
   listarCarrosDisponiveis(): Carro[] {
     const todosOsCarros = this.carroRepository.listaTodos();
 

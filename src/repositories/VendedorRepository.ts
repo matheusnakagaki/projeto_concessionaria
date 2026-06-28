@@ -3,6 +3,7 @@ import { Vendedor } from "../models/Vendedor";
 export class VendedorRepository {
   private static instance: VendedorRepository;
   private vendedores: Vendedor[] = [];
+  private proximoId: number = 1;
 
   private constructor() {}
 
@@ -11,6 +12,10 @@ export class VendedorRepository {
       this.instance = new VendedorRepository();
     }
     return this.instance;
+  }
+
+  gerarProximoId(): number {
+    return this.proximoId++;
   }
 
   // LISTAGEM
