@@ -3,6 +3,7 @@ import { Estoque } from "../models/Estoque";
 export class EstoqueRepository {
   private static instance: EstoqueRepository;
   private estoqueCompleto: Estoque[] = [];
+  private proximoId: number = 1;
 
   private constructor() {}
 
@@ -11,6 +12,10 @@ export class EstoqueRepository {
       this.instance = new EstoqueRepository();
     }
     return this.instance;
+  }
+
+  gerarProximoId(): number {
+    return this.proximoId++;
   }
 
   // LISTAGEM

@@ -7,17 +7,11 @@ export class EstoqueService {
   carroRepository: CarroRepository = CarroRepository.getInstance();
 
   cadastrarEstoque(dadosEstoque: any): Estoque {
-    const {
-      id_estoque,
-      id_carro,
-      quantidade,
-      localizacao_patio,
-      data_entrada,
-    } = dadosEstoque;
+    const { id_carro, quantidade, localizacao_patio, data_entrada } =
+      dadosEstoque;
 
     if (
-      !id_estoque ||
-      !id_carro ||
+      id_carro === undefined ||
       quantidade === undefined ||
       quantidade === null ||
       !localizacao_patio ||
@@ -25,27 +19,35 @@ export class EstoqueService {
     ) {
       throw new Error("Informações obrigatórias incompletas");
     }
-    // Unicidade da chave primária
-    if (this.estoqueRepository.filtraPorId(id_estoque)) {
-      throw new Error("Já existe um estoque com este ID");
-    }
-    const carro = this.carroRepository.filtraPorId(id_carro);
+
+    const carro = this.carroRepository.filtraPorId(Number(id_carro));
+
     if (!carro) {
       throw new Error(
         "Carro não encontrado. Não é possível adicionar ao estoque.",
       );
     }
-    if (this.estoqueRepository.filtraPorIdCarro(id_carro)) {
-      throw new Error("Este carro já possui um registro de estoque.");
-    }
-    if (quantidade < 0) {
+
+    if (!Number.isInteger(quantidade) || quantidade < 0) {
       throw new Error("A quantidade em estoque não pode ser negativa.");
     }
-    if (new Date(data_entrada) > new Date()) {
-      throw new Error(
-        "Não permitido o uso de data de entrada maior do que a data atual",
-      );
+
+    const dataEntrada = new Date(data_entrada);
+    const hoje = new Date();
+
+    if (dataEntrada > hoje) {
+      throw new Error("Data de entrada não pode ser futura");
     }
+
+    const estoqueExistente = this.estoqueRepository.filtraPorIdCarro(
+      Number(id_carro),
+    );
+
+    if (estoqueExistente) {
+      throw new Error("Já existe estoque para este carro");
+    }
+
+    const id_estoque = this.estoqueRepository.gerarProximoId();
 
     const novoEstoque = new Estoque(
       id_estoque,
@@ -76,17 +78,61 @@ export class EstoqueService {
     return estoque;
   }
 
-  atualizarEstoque(id: number, dados: any): Estoque {
-    const estoque = this.buscarPorId(id);
-    if (dados.quantidade !== undefined) estoque.quantidade = dados.quantidade;
-    if (dados.localizacao_patio)
-      estoque.localizacao_patio = dados.localizacao_patio;
+  atualizarEstoque(id: number, dadosEstoque: any): Estoque {
+    const estoqueExistente = this.estoqueRepository.filtraPorId(id);
 
-    this.estoqueRepository.atualiza(id, estoque);
-    return estoque;
+    if (!estoqueExistente) {
+      throw new Error("Estoque não encontrado");
+    }
+
+    const quantidade =
+      dadosEstoque.quantidade !== undefined
+        ? dadosEstoque.quantidade
+        : estoqueExistente.quantidade;
+
+    const localizacao_patio =
+      dadosEstoque.localizacao_patio !== undefined
+        ? dadosEstoque.localizacao_patio
+        : estoqueExistente.localizacao_patio;
+
+    const data_entrada =
+      dadosEstoque.data_entrada !== undefined
+        ? dadosEstoque.data_entrada
+        : estoqueExistente.data_entrada;
+
+    if (!Number.isInteger(quantidade) || quantidade < 0) {
+      throw new Error(
+        "Quantidade deve ser um número inteiro maior ou igual a zero",
+      );
+    }
+
+    const dataEntrada = new Date(data_entrada);
+    const hoje = new Date();
+
+    if (dataEntrada > hoje) {
+      throw new Error("Data de entrada não pode ser futura");
+    }
+
+    const estoqueAtualizado = new Estoque(
+      estoqueExistente.id_estoque,
+      estoqueExistente.id_carro,
+      quantidade,
+      localizacao_patio,
+      data_entrada,
+    );
+
+    this.estoqueRepository.atualiza(id, estoqueAtualizado);
+
+    return estoqueAtualizado;
   }
 
   removerEstoque(id: number): void {
+    const estoque = this.estoqueRepository.filtraPorId(id);
+
+    if (!estoque) {
+      throw new Error("Estoque não encontrado");
+    }
+
     this.estoqueRepository.remove(id);
   }
 }

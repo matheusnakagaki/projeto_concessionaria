@@ -7,7 +7,6 @@ export function cadastrarEstoque(req: Request, res: Response) {
   try {
     const novoEstoque = estoqueService.cadastrarEstoque(req.body);
     res.status(201).json({
-      mensagem: "Estoque cadastrado com sucesso!",
       estoque: novoEstoque,
     });
   } catch (error: any) {
