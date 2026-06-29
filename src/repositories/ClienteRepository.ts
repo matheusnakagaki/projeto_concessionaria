@@ -1,4 +1,5 @@
 import { Cliente } from "../models/Cliente";
+import { executarComandoSQL } from "../database/mysql";
 
 export class ClienteRepository {
   private static instance: ClienteRepository;
@@ -14,6 +15,19 @@ export class ClienteRepository {
     return this.instance;
   }
 
+  static getCreateTableQuery(): string {
+    return `
+    CREATE TABLE IF NOT EXISTS clientes (
+      id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+      nome VARCHAR(255) NOT NULL,
+      cpf VARCHAR(20) NOT NULL UNIQUE,
+      telefone VARCHAR(30) NOT NULL,
+      email VARCHAR(255),
+      cidade VARCHAR(100)
+    );
+  `;
+  }
+  
   gerarProximoId(): number {
     return this.proximoId++;
   }

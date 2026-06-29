@@ -1,5 +1,6 @@
 import mysql, { Connection, QueryError } from "mysql2";
 import dotenv from "dotenv";
+import { ClienteRepository } from "../repositories/ClienteRepository";
 
 dotenv.config();
 
@@ -23,7 +24,10 @@ mysqlConnection.connect((err: QueryError | null) => {
   console.log("Conexão bem-sucedida com o banco de dados MySQL");
 });
 
-export function executarComandoSQL(query: string, valores: any[]): Promise<any> {
+export function executarComandoSQL(
+  query: string,
+  valores: any[],
+): Promise<any> {
   return new Promise<any>((resolve, reject) => {
     mysqlConnection.query(query, valores, (err, resultado) => {
       if (err) {
@@ -43,10 +47,16 @@ export async function inicializarBanco(): Promise<void> {
   try {
     await executarComandoSQL(
       `CREATE DATABASE IF NOT EXISTS ${databaseName}`,
-      []
+      [],
     );
 
     await executarComandoSQL(`USE ${databaseName}`, []);
+
+    const schemas = [ClienteRepository.getCreateTableQuery()];
+
+    for (const query of schemas) {
+      await executarComandoSQL(query, []);
+    }
 
     console.log(`Conectado ao schema: ${databaseName}`);
     console.log("Banco de dados inicializado com sucesso.");
