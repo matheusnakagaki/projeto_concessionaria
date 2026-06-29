@@ -1,9 +1,7 @@
 import { Estoque } from "../models/Estoque";
-
+import { executarComandoSQL } from "../database/mysql";
 export class EstoqueRepository {
   private static instance: EstoqueRepository;
-  private estoqueCompleto: Estoque[] = [];
-  private proximoId: number = 1;
 
   private constructor() {}
 
@@ -27,49 +25,123 @@ export class EstoqueRepository {
   `;
   }
 
-  gerarProximoId(): number {
-    return this.proximoId++;
-  }
-
   // LISTAGEM
-  listaTodos(): Estoque[] {
-    return this.estoqueCompleto;
-  }
+  async listaTodos(): Promise<Estoque[]> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_estoque, id_carro, quantidade, localizacao_patio, data_entrada FROM estoque",
+      [],
+    );
 
+    return linhas.map((linha: any) => {
+      return new Estoque(
+        linha.id_estoque,
+        linha.id_carro,
+        linha.quantidade,
+        linha.localizacao_patio,
+        new Date(linha.data_entrada),
+      );
+    });
+  }
   // BUSCA POR ID DO ESTOQUE
-  filtraPorId(id: number): Estoque | undefined {
-    return this.estoqueCompleto.find((estoque) => estoque.id_estoque === id);
-  }
+  async filtraPorId(id: number): Promise<Estoque | null> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_estoque, id_carro, quantidade, localizacao_patio, data_entrada FROM estoque WHERE id_estoque = ?",
+      [id],
+    );
 
+    if (linhas.length === 0) {
+      return null;
+    }
+
+    const linha = linhas[0];
+
+    return new Estoque(
+      linha.id_estoque,
+      linha.id_carro,
+      linha.quantidade,
+      linha.localizacao_patio,
+      new Date(linha.data_entrada),
+    );
+  }
   // BUSCA POR ID DO CARRO
-  filtraPorIdCarro(id_carro: number): Estoque | undefined {
-    return this.estoqueCompleto.find(
-      (estoque) => estoque.id_carro === id_carro,
+  async filtraPorIdCarro(id_carro: number): Promise<Estoque | null> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_estoque, id_carro, quantidade, localizacao_patio, data_entrada FROM estoque WHERE id_carro = ?",
+      [id_carro],
+    );
+
+    if (linhas.length === 0) {
+      return null;
+    }
+
+    const linha = linhas[0];
+
+    return new Estoque(
+      linha.id_estoque,
+      linha.id_carro,
+      linha.quantidade,
+      linha.localizacao_patio,
+      new Date(linha.data_entrada),
     );
   }
 
   // CADASTRO
-  cadastra(estoque: Estoque): void {
-    this.estoqueCompleto.push(estoque);
+  async cadastra(estoque: Estoque): Promise<Estoque> {
+    const resultado = await executarComandoSQL(
+      "INSERT INTO estoque (id_carro, quantidade, localizacao_patio, data_entrada) VALUES (?, ?, ?, ?)",
+      [
+        estoque.id_carro,
+        estoque.quantidade,
+        estoque.localizacao_patio,
+        estoque.data_entrada,
+      ],
+    );
+
+    return new Estoque(
+      resultado.insertId,
+      estoque.id_carro,
+      estoque.quantidade,
+      estoque.localizacao_patio,
+      estoque.data_entrada,
+    );
   }
 
   // ATUALIZAÇÃO
-  atualiza(id: number, estoqueAtualizado: Estoque): boolean {
-    const index = this.estoqueCompleto.findIndex(
-      (estoque) => estoque.id_estoque === id,
+  async atualiza(
+    id: number,
+    estoqueAtualizado: Estoque,
+  ): Promise<Estoque | null> {
+    const resultado = await executarComandoSQL(
+      "UPDATE estoque SET id_carro = ?, quantidade = ?, localizacao_patio = ?, data_entrada = ? WHERE id_estoque = ?",
+      [
+        estoqueAtualizado.id_carro,
+        estoqueAtualizado.quantidade,
+        estoqueAtualizado.localizacao_patio,
+        estoqueAtualizado.data_entrada,
+        id,
+      ],
     );
-    if (index !== -1) {
-      this.estoqueCompleto[index] = estoqueAtualizado;
-      return true;
+
+    if (resultado.affectedRows === 0) {
+      return null;
     }
-    return false;
+
+    return new Estoque(
+      id,
+      estoqueAtualizado.id_carro,
+      estoqueAtualizado.quantidade,
+      estoqueAtualizado.localizacao_patio,
+      estoqueAtualizado.data_entrada,
+    );
   }
 
   // REMOÇÃO
-  remove(id: number): void {
-    const index = this.estoqueCompleto.findIndex((e) => e.id_estoque === id);
-    if (index !== -1) {
-      this.estoqueCompleto.splice(index, 1);
-    }
+  async remove(id: number): Promise<boolean> {
+    const resultado = await executarComandoSQL(
+      "DELETE FROM estoque WHERE id_estoque = ?",
+      [id],
+    );
+
+    return resultado.affectedRows > 0;
   }
 }

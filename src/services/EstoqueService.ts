@@ -6,7 +6,7 @@ export class EstoqueService {
   estoqueRepository: EstoqueRepository = EstoqueRepository.getInstance();
   carroRepository: CarroRepository = CarroRepository.getInstance();
 
-  cadastrarEstoque(dadosEstoque: any): Estoque {
+  async cadastrarEstoque(dadosEstoque: any): Promise<Estoque> {
     const { id_carro, quantidade, localizacao_patio, data_entrada } =
       dadosEstoque;
 
@@ -20,7 +20,7 @@ export class EstoqueService {
       throw new Error("Informações obrigatórias incompletas");
     }
 
-    const carro = this.carroRepository.filtraPorId(Number(id_carro));
+    const carro = await this.carroRepository.filtraPorId(Number(id_carro));
 
     if (!carro) {
       throw new Error(
@@ -39,7 +39,7 @@ export class EstoqueService {
       throw new Error("Data de entrada não pode ser futura");
     }
 
-    const estoqueExistente = this.estoqueRepository.filtraPorIdCarro(
+    const estoqueExistente = await this.estoqueRepository.filtraPorIdCarro(
       Number(id_carro),
     );
 
@@ -47,39 +47,37 @@ export class EstoqueService {
       throw new Error("Já existe estoque para este carro");
     }
 
-    const id_estoque = this.estoqueRepository.gerarProximoId();
-
     const novoEstoque = new Estoque(
-      id_estoque,
-      id_carro,
+      null,
+      Number(id_carro),
       quantidade,
       localizacao_patio,
       new Date(data_entrada),
     );
-    this.estoqueRepository.cadastra(novoEstoque);
-    return novoEstoque;
+
+    return await this.estoqueRepository.cadastra(novoEstoque);
   }
 
-  listarEstoques(): Estoque[] {
-    return this.estoqueRepository.listaTodos();
+  async listarEstoques(): Promise<Estoque[]> {
+    return await this.estoqueRepository.listaTodos();
   }
 
-  buscarPorId(id: number): Estoque {
-    const estoque = this.estoqueRepository.filtraPorId(id);
+  async buscarPorId(id: number): Promise<Estoque> {
+    const estoque = await this.estoqueRepository.filtraPorId(id);
     if (!estoque) throw new Error("Estoque não encontrado");
     return estoque;
   }
 
-  buscarEstoquePorCarro(id_carro: number): Estoque {
-    const estoque = this.estoqueRepository.filtraPorIdCarro(id_carro);
+  async buscarEstoquePorCarro(id_carro: number): Promise<Estoque> {
+    const estoque = await this.estoqueRepository.filtraPorIdCarro(id_carro);
     if (!estoque) {
       throw new Error("Estoque não encontrado para este carro.");
     }
     return estoque;
   }
 
-  atualizarEstoque(id: number, dadosEstoque: any): Estoque {
-    const estoqueExistente = this.estoqueRepository.filtraPorId(id);
+  async atualizarEstoque(id: number, dadosEstoque: any): Promise<Estoque> {
+    const estoqueExistente = await this.estoqueRepository.filtraPorId(id);
 
     if (!estoqueExistente) {
       throw new Error("Estoque não encontrado");
@@ -114,25 +112,34 @@ export class EstoqueService {
     }
 
     const estoqueAtualizado = new Estoque(
-      estoqueExistente.id_estoque,
+      id,
       estoqueExistente.id_carro,
       quantidade,
       localizacao_patio,
-      data_entrada,
+      new Date(data_entrada),
     );
 
-    this.estoqueRepository.atualiza(id, estoqueAtualizado);
+    const estoqueSalvo = await this.estoqueRepository.atualiza(
+      id,
+      estoqueAtualizado,
+    );
 
-    return estoqueAtualizado;
+    if (!estoqueSalvo) {
+      throw new Error("Estoque não encontrado");
+    }
+
+    return estoqueSalvo;
   }
 
-  removerEstoque(id: number): void {
-    const estoque = this.estoqueRepository.filtraPorId(id);
+  async removerEstoque(id: number): Promise<Estoque> {
+    const estoque = await this.estoqueRepository.filtraPorId(id);
 
     if (!estoque) {
       throw new Error("Estoque não encontrado");
     }
 
-    this.estoqueRepository.remove(id);
+    await this.estoqueRepository.remove(id);
+
+    return estoque;
   }
 }

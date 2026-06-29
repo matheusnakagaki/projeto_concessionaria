@@ -9,7 +9,7 @@ export async function cadastrarVendedor(req: Request, res: Response) {
   try {
     const novoVendedor = await vendedorService.cadastrarVendedor(req.body);
     res.status(201).json({
-      vendedor: novoVendedor,
+      novoVendedor,
     });
   } catch (error: any) {
     const mensagem = error.message;
@@ -76,9 +76,6 @@ export async function removerVendedor(req: Request, res: Response) {
     const vendedorRemovido = await vendedorService.removerVendedor(id);
 
     return res.status(200).json(vendedorRemovido);
-    return res.status(200).json({
-      mensagem: "Vendedor removido com sucesso!",
-    });
   } catch (error: any) {
     const mensagem = error.message;
     if (mensagem === "Vendedor não encontrado") {

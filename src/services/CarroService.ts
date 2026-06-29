@@ -109,7 +109,7 @@ export class CarroService {
       throw new Error("Carro não encontrado");
     }
 
-    const estoqueDoCarro = this.estoqueRepository.filtraPorIdCarro(id);
+    const estoqueDoCarro = await this.estoqueRepository.filtraPorIdCarro(id);
     const notasDoCarro = this.notaRepository.filtraNotaPorIdCarro(id);
 
     if (estoqueDoCarro || notasDoCarro.length > 0) {
@@ -125,13 +125,22 @@ export class CarroService {
 
   async listarCarrosDisponiveis(): Promise<Carro[]> {
     const todosOsCarros = await this.carroRepository.listaTodos();
+    const carrosDisponiveis: Carro[] = [];
 
-    return todosOsCarros.filter((carro) => {
+    for (const carro of todosOsCarros) {
       if (carro.id_carro === null) {
-        return false;
+        continue;
       }
-      const estoque = this.estoqueRepository.filtraPorIdCarro(carro.id_carro);
-      return estoque && estoque.quantidade > 0;
-    });
+
+      const estoque = await this.estoqueRepository.filtraPorIdCarro(
+        carro.id_carro,
+      );
+
+      if (estoque && estoque.quantidade > 0) {
+        carrosDisponiveis.push(carro);
+      }
+    }
+
+    return carrosDisponiveis;
   }
 }

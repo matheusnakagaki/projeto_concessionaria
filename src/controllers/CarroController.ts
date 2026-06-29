@@ -7,7 +7,7 @@ export async function cadastrarCarro(req: Request, res: Response) {
   try {
     const novoCarro = await carroService.cadastrarCarro(req.body);
     res.status(201).json({
-      carro: novoCarro,
+      novoCarro,
     });
   } catch (error: any) {
     const mensagem = error.message;

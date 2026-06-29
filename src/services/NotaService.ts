@@ -13,7 +13,7 @@ export class NotaService {
   clienteRepository: ClienteRepository = ClienteRepository.getInstance();
   vendedorRepository: VendedorRepository = VendedorRepository.getInstance();
 
-  cadastrarNota(dadosNota: any): Nota {
+  async cadastrarNota(dadosNota: any): Promise<Nota> {
     const {
       numero_nota,
       data_emissao,
@@ -35,15 +35,29 @@ export class NotaService {
     }
 
     // Validações de existência (RN05)
-    if (!this.clienteRepository.filtraPorId(id_cliente))
+    const cliente = await this.clienteRepository.filtraPorId(
+      Number(id_cliente),
+    );
+    if (!cliente) {
       throw new Error("Cliente não encontrado");
-    if (!this.vendedorRepository.filtraPorId(id_vendedor))
+    }
+
+    const vendedor = await this.vendedorRepository.filtraPorId(
+      Number(id_vendedor),
+    );
+    if (!vendedor) {
       throw new Error("Vendedor não encontrado");
-    if (!this.carroRepository.filtraPorId(id_carro))
+    }
+
+    const carro = await this.carroRepository.filtraPorId(Number(id_carro));
+    if (!carro) {
       throw new Error("Carro não encontrado");
+    }
 
     // Validação de Estoque (RN05)
-    const estoque = this.estoqueRepository.filtraPorIdCarro(Number(id_carro));
+    const estoque = await this.estoqueRepository.filtraPorIdCarro(
+      Number(id_carro),
+    );
     if (!estoque || estoque.quantidade <= 0) {
       throw new Error("Carro indisponível em estoque");
     }
@@ -91,7 +105,10 @@ export class NotaService {
     if (estoque.id_estoque === null) {
       throw new Error("Estoque inválido");
     }
-    this.estoqueRepository.atualiza(estoque.id_estoque, estoqueAtualizado);
+    await this.estoqueRepository.atualiza(
+      estoque.id_estoque,
+      estoqueAtualizado,
+    );
 
     return novaNota;
   }

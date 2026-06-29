@@ -3,45 +3,59 @@ import { EstoqueService } from "../services/EstoqueService";
 
 const estoqueService = new EstoqueService();
 
-export function cadastrarEstoque(req: Request, res: Response) {
+export async function cadastrarEstoque(req: Request, res: Response) {
   try {
-    const novoEstoque = estoqueService.cadastrarEstoque(req.body);
-    res.status(201).json({
-      estoque: novoEstoque,
-    });
+    const novoEstoque = await estoqueService.cadastrarEstoque(req.body);
+    return res.status(201).json(novoEstoque);
   } catch (error: any) {
     const mensagem = error.message;
+
     if (mensagem === "Informações obrigatórias incompletas") {
-      return res.status(400).json({ mensagem: error.message });
+      return res.status(400).json({ mensagem });
     }
-    if (mensagem.includes("Já existe")) {
-      return res.status(409).json({ mensagem: error.message });
-    }
+
     if (mensagem.includes("Carro não encontrado")) {
       return res.status(404).json({ mensagem });
     }
+
+    if (mensagem.includes("Já existe")) {
+      return res.status(409).json({ mensagem });
+    }
+
+    if (
+      mensagem.includes("quantidade") ||
+      mensagem.includes("Quantidade") ||
+      mensagem.includes("Data")
+    ) {
+      return res.status(400).json({ mensagem });
+    }
+
+    return res.status(400).json({ mensagem });
   }
 }
 
-export function listarEstoques(req: Request, res: Response) {
-  const estoques = estoqueService.listarEstoques();
+export async function listarEstoques(req: Request, res: Response) {
+  const estoques = await estoqueService.listarEstoques();
   return res.status(200).json(estoques);
 }
 
-export function buscarEstoquePorId(req: Request, res: Response) {
+export async function buscarEstoquePorId(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const estoque = estoqueService.buscarPorId(id);
+    const estoque = await estoqueService.buscarPorId(id);
     return res.status(200).json(estoque);
   } catch (error: any) {
     return res.status(404).json({ mensagem: error.message });
   }
 }
 
-export function atualizarEstoque(req: Request, res: Response) {
+export async function atualizarEstoque(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const estoqueAtualizado = estoqueService.atualizarEstoque(id, req.body);
+    const estoqueAtualizado = await estoqueService.atualizarEstoque(
+      id,
+      req.body,
+    );
 
     return res.status(200).json(estoqueAtualizado);
   } catch (error: any) {
@@ -63,10 +77,10 @@ export function atualizarEstoque(req: Request, res: Response) {
   }
 }
 
-export function removerEstoque(req: Request, res: Response) {
+export async function removerEstoque(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    estoqueService.removerEstoque(id);
+    const estoqueRemovido = await estoqueService.removerEstoque(id);
     return res.status(200).json({ mensagem: "Estoque removido com sucesso!" });
   } catch (error: any) {
     if (error.message.includes("Não é permitido remover"))
@@ -77,10 +91,10 @@ export function removerEstoque(req: Request, res: Response) {
   }
 }
 
-export function buscarEstoquePorIdCarro(req: Request, res: Response) {
+export async function buscarEstoquePorCarro(req: Request, res: Response) {
   try {
-    const idCarro = parseInt(req.params.id_carro as string);
-    const estoque = estoqueService.buscarEstoquePorCarro(idCarro);
+    const id_carro = parseInt(req.params.id_carro as string);
+    const estoque = await estoqueService.buscarEstoquePorCarro(id_carro);
     return res.status(200).json(estoque);
   } catch (error: any) {
     return res.status(404).json({ mensagem: error.message });

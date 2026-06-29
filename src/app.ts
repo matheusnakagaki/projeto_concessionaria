@@ -2,7 +2,7 @@ import express from "express";
 import { listarClientes,  buscarClientePorId, cadastrarCliente, atualizarCliente, removerCliente, listarNotasDoCliente } from "./controllers/ClienteController";
 import { listarVendedores, buscarVendedorPorId, cadastrarVendedor, atualizarVendedor, removerVendedor, listarNotasDoVendedor } from "./controllers/VendedorController";
 import { listarCarros, buscarCarroPorId, cadastrarCarro, atualizarCarro, removerCarro, listarCarrosDisponiveis   } from "./controllers/CarroController";
-import { listarEstoques, buscarEstoquePorId, buscarEstoquePorIdCarro, cadastrarEstoque, atualizarEstoque, removerEstoque  } from "./controllers/EstoqueController";
+import { listarEstoques, buscarEstoquePorId, buscarEstoquePorCarro, cadastrarEstoque, atualizarEstoque, removerEstoque  } from "./controllers/EstoqueController";
 import { listarNotas, buscarNotaPorId, cadastrarNota } from "./controllers/NotaController";
 import { inicializarBanco } from "./database/mysql";
 
@@ -42,7 +42,7 @@ app.delete("/carros/:id", removerCarro);
 
 // Rotas do Estoque
 app.get("/estoque", listarEstoques);
-app.get("/estoque/carro/:id_carro", buscarEstoquePorIdCarro); // ← estática antes
+app.get("/estoque/carro/:id_carro", buscarEstoquePorCarro); // ← estática antes
 app.get("/estoque/:id", buscarEstoquePorId);
 app.post("/estoque", cadastrarEstoque);
 app.put("/estoque/:id", atualizarEstoque);
