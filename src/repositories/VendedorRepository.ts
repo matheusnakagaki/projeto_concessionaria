@@ -1,9 +1,8 @@
 import { Vendedor } from "../models/Vendedor";
+import { executarComandoSQL } from "../database/mysql";
 
 export class VendedorRepository {
   private static instance: VendedorRepository;
-  private vendedores: Vendedor[] = [];
-  private proximoId: number = 1;
 
   private constructor() {}
 
@@ -15,7 +14,7 @@ export class VendedorRepository {
   }
 
   static getCreateTableQuery(): string {
-  return `
+    return `
     CREATE TABLE IF NOT EXISTS vendedores (
       id_vendedor INT AUTO_INCREMENT PRIMARY KEY,
       nome VARCHAR(255) NOT NULL,
@@ -23,49 +22,116 @@ export class VendedorRepository {
       comissao_percentual DECIMAL(5,2) NOT NULL
     );
   `;
-}
-
-  gerarProximoId(): number {
-    return this.proximoId++;
   }
 
   // LISTAGEM
-  listaTodos(): Vendedor[] {
-    return this.vendedores;
+  async listaTodos(): Promise<Vendedor[]> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_vendedor, nome, matricula, comissao_percentual FROM vendedores",
+      [],
+    );
+
+    return linhas.map((linha: any) => {
+      return new Vendedor(
+        linha.id_vendedor,
+        linha.nome,
+        linha.matricula,
+        Number(linha.comissao_percentual),
+      );
+    });
   }
 
   // BUSCA
-  filtraPorId(id: number): Vendedor | undefined {
-    return this.vendedores.find((vendedor) => vendedor.id_vendedor === id);
+  async filtraPorId(id: number): Promise<Vendedor | null> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_vendedor, nome, matricula, comissao_percentual FROM vendedores WHERE id_vendedor = ?",
+      [id],
+    );
+
+    if (linhas.length === 0) {
+      return null;
+    }
+
+    const linha = linhas[0];
+
+    return new Vendedor(
+      linha.id_vendedor,
+      linha.nome,
+      linha.matricula,
+      Number(linha.comissao_percentual),
+    );
   }
 
   // CADASTRO
-  cadastra(vendedor: Vendedor): void {
-    this.vendedores.push(vendedor);
+  async cadastra(vendedor: Vendedor): Promise<Vendedor> {
+    const resultado = await executarComandoSQL(
+      "INSERT INTO vendedores (nome, matricula, comissao_percentual) VALUES (?, ?, ?)",
+      [vendedor.nome, vendedor.matricula, vendedor.comissao_percentual],
+    );
+
+    return new Vendedor(
+      resultado.insertId,
+      vendedor.nome,
+      vendedor.matricula,
+      vendedor.comissao_percentual,
+    );
   }
 
   // ATUALIZAÇÃO
-  atualiza(id: number, vendedorAtualizado: Vendedor): boolean {
-    const index = this.vendedores.findIndex((vendedor) => vendedor.id_vendedor === id);
-    if (index !== -1) {
-      this.vendedores[index] = vendedorAtualizado;
-      return true;
+  async atualiza(
+    id: number,
+    vendedorAtualizado: Vendedor,
+  ): Promise<Vendedor | null> {
+    const resultado = await executarComandoSQL(
+      "UPDATE vendedores SET nome = ?, matricula = ?, comissao_percentual = ? WHERE id_vendedor = ?",
+      [
+        vendedorAtualizado.nome,
+        vendedorAtualizado.matricula,
+        vendedorAtualizado.comissao_percentual,
+        id,
+      ],
+    );
+
+    if (resultado.affectedRows === 0) {
+      return null;
     }
-    return false;
+
+    return new Vendedor(
+      id,
+      vendedorAtualizado.nome,
+      vendedorAtualizado.matricula,
+      vendedorAtualizado.comissao_percentual,
+    );
   }
 
   // REMOÇÃO
-  remove(id: number): void {
-    const index = this.vendedores.findIndex(
-      (vendedor) => vendedor.id_vendedor === id,
+  async remove(id: number): Promise<boolean> {
+    const resultado = await executarComandoSQL(
+      "DELETE FROM vendedores WHERE id_vendedor = ?",
+      [id],
     );
-    if (index !== -1) {
-      this.vendedores.splice(index, 1);
-    }
+
+    return resultado.affectedRows > 0;
   }
 
   // FILTRO INTERNO (RN02) -> Validação acontece na camada de serviço
-  filtraPorMatricula(matricula: string): Vendedor | undefined {
-    return this.vendedores.find((vendedor) => vendedor.matricula === matricula);
+  async filtraPorMatricula(matricula: string): Promise<Vendedor | null> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_vendedor, nome, matricula, comissao_percentual FROM vendedores WHERE matricula = ?",
+      [matricula],
+    );
+
+    if (linhas.length === 0) {
+      return null;
+    }
+
+    const linha = linhas[0];
+
+    return new Vendedor(
+      linha.id_vendedor,
+      linha.nome,
+      linha.matricula,
+      Number(linha.comissao_percentual),
+    );
   }
 }

@@ -6,7 +6,7 @@ export class VendedorService {
   vendedorRepository: VendedorRepository = VendedorRepository.getInstance();
   notaRepository: NotaRepository = NotaRepository.getInstance();
 
-  cadastrarVendedor(dadosVendedor: any): Vendedor {
+  async cadastrarVendedor(dadosVendedor: any): Promise<Vendedor> {
     const { nome, matricula, comissao_percentual } = dadosVendedor;
 
     if (!nome || !matricula || comissao_percentual === undefined) {
@@ -14,39 +14,43 @@ export class VendedorService {
     }
     // Unicidade da chave primária
 
-    if (this.vendedorRepository.filtraPorMatricula(matricula)) {
-      throw new Error("Já existe um vendedor com esta Matrícula");
-    }
-    if (comissao_percentual < 0 || comissao_percentual > 30) {
-      throw new Error(
-        "Percentual de Comissão deve ser maior que 0 e menor que 30",
-      );
+    const vendedorExistente =
+      await this.vendedorRepository.filtraPorMatricula(matricula);
+
+    if (vendedorExistente) {
+      throw new Error("Já existe um vendedor com esta matrícula");
     }
 
-    const id_vendedor = this.vendedorRepository.gerarProximoId();
+    if (comissao_percentual < 0 || comissao_percentual > 30) {
+      throw new Error("Comissão percentual deve estar entre 0 e 30");
+    }
 
     const novoVendedor = new Vendedor(
-      id_vendedor,
+      null,
       nome,
       matricula,
       comissao_percentual,
     );
-    this.vendedorRepository.cadastra(novoVendedor);
-    return novoVendedor;
+
+    return await this.vendedorRepository.cadastra(novoVendedor);
   }
 
-  listarVendedores(): Vendedor[] {
-    return this.vendedorRepository.listaTodos();
+  async listarVendedores(): Promise<Vendedor[]> {
+    return await this.vendedorRepository.listaTodos();
   }
 
-  buscarPorId(id: number): Vendedor {
-    const vendedor = this.vendedorRepository.filtraPorId(id);
-    if (!vendedor) throw new Error("Vendedor não encontrado");
+  async buscarPorId(id: number): Promise<Vendedor> {
+    const vendedor = await this.vendedorRepository.filtraPorId(id);
+
+    if (!vendedor) {
+      throw new Error("Vendedor não encontrado");
+    }
+
     return vendedor;
   }
 
-  atualizarVendedor(id: number, dados: any): Vendedor {
-    const vendedorExistente = this.vendedorRepository.filtraPorId(id);
+  async atualizarVendedor(id: number, dados: any): Promise<Vendedor> {
+    const vendedorExistente = await this.vendedorRepository.filtraPorId(id);
 
     if (!vendedorExistente) {
       throw new Error("Vendedor não encontrado");
@@ -64,7 +68,8 @@ export class VendedorService {
       throw new Error("Informações obrigatórias incompletas");
     }
     const vendedorComMesmaMatricula =
-      this.vendedorRepository.filtraPorMatricula(matricula);
+      await this.vendedorRepository.filtraPorMatricula(matricula);
+    this.vendedorRepository.filtraPorMatricula(matricula);
     if (
       vendedorComMesmaMatricula &&
       vendedorComMesmaMatricula.id_vendedor !== id
@@ -80,13 +85,21 @@ export class VendedorService {
       matricula,
       comissao_percentual,
     );
-    this.vendedorRepository.atualiza(id, vendedorAtualizado);
-    return vendedorAtualizado;
+    const vendedorSalvo = await this.vendedorRepository.atualiza(
+      id,
+      vendedorAtualizado,
+    );
+
+    if (!vendedorSalvo) {
+      throw new Error("Vendedor não encontrado");
+    }
+
+    return vendedorSalvo;
   }
 
   // RN02: Não permitir remover se tiver notas vinculadas
-  removerVendedor(id: number): void {
-    const vendedor = this.vendedorRepository.filtraPorId(id);
+  async removerVendedor(id: number): Promise<Vendedor> {
+    const vendedor = await this.vendedorRepository.filtraPorId(id);
     if (!vendedor) {
       throw new Error("Vendedor não encontrado");
     }
@@ -96,6 +109,8 @@ export class VendedorService {
         "Não é permitido remover vendedor que possui notas fiscais vinculadas",
       );
     }
-    this.vendedorRepository.remove(id);
+    await this.vendedorRepository.remove(id);
+
+    return vendedor;
   }
 }

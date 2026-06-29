@@ -5,9 +5,9 @@ import { NotaRepository } from "../repositories/NotaRepository";
 const vendedorService = new VendedorService();
 const notaRepository = NotaRepository.getInstance();
 
-export function cadastrarVendedor(req: Request, res: Response) {
+export async function cadastrarVendedor(req: Request, res: Response) {
   try {
-    const novoVendedor = vendedorService.cadastrarVendedor(req.body);
+    const novoVendedor = await vendedorService.cadastrarVendedor(req.body);
     res.status(201).json({
       vendedor: novoVendedor,
     });
@@ -26,25 +26,28 @@ export function cadastrarVendedor(req: Request, res: Response) {
   }
 }
 
-export function listarVendedores(req: Request, res: Response) {
-  const vendedores = vendedorService.listarVendedores();
+export async function listarVendedores(req: Request, res: Response) {
+  const vendedores = await vendedorService.listarVendedores();
   return res.status(200).json(vendedores);
 }
 
-export function buscarVendedorPorId(req: Request, res: Response) {
+export async function buscarVendedorPorId(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const vendedor = vendedorService.buscarPorId(id);
+    const vendedor = await vendedorService.buscarPorId(id);
     return res.status(200).json(vendedor);
   } catch (error: any) {
     return res.status(404).json({ mensagem: error.message });
   }
 }
 
-export function atualizarVendedor(req: Request, res: Response) {
+export async function atualizarVendedor(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const vendedorAtualizado = vendedorService.atualizarVendedor(id, req.body);
+    const vendedorAtualizado = await vendedorService.atualizarVendedor(
+      id,
+      req.body,
+    );
 
     return res.status(200).json(vendedorAtualizado);
   } catch (error: any) {
@@ -67,10 +70,12 @@ export function atualizarVendedor(req: Request, res: Response) {
   }
 }
 
-export function removerVendedor(req: Request, res: Response) {
+export async function removerVendedor(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    vendedorService.removerVendedor(id);
+    const vendedorRemovido = await vendedorService.removerVendedor(id);
+
+    return res.status(200).json(vendedorRemovido);
     return res.status(200).json({
       mensagem: "Vendedor removido com sucesso!",
     });
