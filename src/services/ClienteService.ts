@@ -6,44 +6,40 @@ export class ClienteService {
   clienteRepository: ClienteRepository = ClienteRepository.getInstance();
   notaRepository: NotaRepository = NotaRepository.getInstance();
 
-  cadastrarCliente(dadosCliente: any): Cliente {
+  async cadastrarCliente(dadosCliente: any): Promise<Cliente> {
     const { nome, cpf, telefone, email, cidade } = dadosCliente;
 
     if (!nome || !cpf || !telefone) {
       throw new Error("Informações obrigatórias incompletas");
     }
 
-    if (this.clienteRepository.filtraPorCpf(cpf)) {
+    const clienteExistente = await this.clienteRepository.filtraPorCpf(cpf);
+
+    if (clienteExistente) {
       throw new Error("Já existe um cliente com este CPF");
     }
 
-    const id_cliente = this.clienteRepository.gerarProximoId();
+    const novoCliente = new Cliente(null, nome, cpf, telefone, email, cidade);
 
-    const novoCliente = new Cliente(
-      id_cliente,
-      nome,
-      cpf,
-      telefone,
-      email,
-      cidade,
-    );
-    this.clienteRepository.cadastra(novoCliente);
-    return novoCliente;
+    return await this.clienteRepository.cadastra(novoCliente);
   }
 
-  listarClientes(): Cliente[] {
+  async listarClientes(): Promise<Cliente[]> {
     return this.clienteRepository.listaTodos();
   }
 
-  buscarPorId(id: number): Cliente {
-    const cliente = this.clienteRepository.filtraPorId(id);
-    if (!cliente) throw new Error("Cliente não encontrado");
+  async buscarPorId(id: number): Promise<Cliente> {
+    const cliente = await this.clienteRepository.filtraPorId(id);
+
+    if (!cliente) {
+      throw new Error("Cliente não encontrado");
+    }
+
     return cliente;
   }
 
-  atualizarCliente(id: number, dados: any): Cliente {
-    const clienteExistente = this.clienteRepository.filtraPorId(id);
-
+  async atualizarCliente(id: number, dados: any): Promise<Cliente> {
+    const clienteExistente = await this.clienteRepository.filtraPorId(id);
     if (!clienteExistente) {
       throw new Error("Cliente não encontrado");
     }
@@ -60,8 +56,7 @@ export class ClienteService {
       throw new Error("Informações obrigatórias incompletas");
     }
 
-    const clienteComMesmoCpf = this.clienteRepository.filtraPorCpf(cpf);
-
+    const clienteComMesmoCpf = await this.clienteRepository.filtraPorCpf(cpf);
     if (clienteComMesmoCpf && clienteComMesmoCpf.id_cliente !== id) {
       throw new Error("Já existe um cliente com este CPF");
     }
@@ -75,14 +70,21 @@ export class ClienteService {
       cidade,
     );
 
-    this.clienteRepository.atualiza(id, clienteAtualizado);
+    const clienteSalvo = await this.clienteRepository.atualiza(
+      id,
+      clienteAtualizado,
+    );
 
-    return clienteAtualizado;
+    if (!clienteSalvo) {
+      throw new Error("Cliente não encontrado");
+    }
+
+    return clienteSalvo;
   }
 
   // RN01: Não permitir remover se tiver notas vinculadas
-  removerCliente(id: number): void {
-    const cliente = this.clienteRepository.filtraPorId(id);
+  async removerCliente(id: number): Promise<void> {
+    const cliente = await this.clienteRepository.filtraPorId(id);
     if (!cliente) {
       throw new Error("Cliente não encontrado");
     }
@@ -93,6 +95,6 @@ export class ClienteService {
         "Não é permitido remover cliente que possui notas fiscais vinculadas",
       );
     }
-    this.clienteRepository.remove(id);
+    await this.clienteRepository.remove(id);
   }
 }

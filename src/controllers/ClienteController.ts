@@ -5,9 +5,9 @@ import { NotaRepository } from "../repositories/NotaRepository";
 const clienteService = new ClienteService();
 const notaRepository = NotaRepository.getInstance();
 
-export function cadastrarCliente(req: Request, res: Response) {
+export async function cadastrarCliente(req: Request, res: Response) {
   try {
-    const novoCliente = clienteService.cadastrarCliente(req.body);
+    const novoCliente = await clienteService.cadastrarCliente(req.body);
     return res.status(201).json(novoCliente);
   } catch (error: any) {
     const mensagem = error.message;
@@ -24,25 +24,28 @@ export function cadastrarCliente(req: Request, res: Response) {
   }
 }
 
-export function listarClientes(req: Request, res: Response) {
-  const clientes = clienteService.listarClientes();
+export async function listarClientes(req: Request, res: Response) {
+  const clientes = await clienteService.listarClientes();
   return res.status(200).json(clientes);
 }
 
-export function buscarClientePorId(req: Request, res: Response) {
+export async function buscarClientePorId(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const cliente = clienteService.buscarPorId(id);
+    const cliente = await clienteService.buscarPorId(id);
     return res.status(200).json(cliente);
   } catch (error: any) {
     return res.status(404).json({ mensagem: error.message });
   }
 }
 
-export function atualizarCliente(req: Request, res: Response) {
+export async function atualizarCliente(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const clienteAtualizado = clienteService.atualizarCliente(id, req.body);
+    const clienteAtualizado = await clienteService.atualizarCliente(
+      id,
+      req.body,
+    );
     return res.status(200).json(clienteAtualizado);
   } catch (error: any) {
     const mensagem = error.message;
@@ -59,10 +62,10 @@ export function atualizarCliente(req: Request, res: Response) {
   }
 }
 
-export function removerCliente(req: Request, res: Response) {
+export async function removerCliente(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    clienteService.removerCliente(id);
+    await clienteService.removerCliente(id);
     return res.status(200).json({
       mensagem: "Cliente removido com sucesso!",
     });

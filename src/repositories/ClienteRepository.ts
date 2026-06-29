@@ -3,8 +3,6 @@ import { executarComandoSQL } from "../database/mysql";
 
 export class ClienteRepository {
   private static instance: ClienteRepository;
-  private clientes: Cliente[] = [];
-  private proximoId: number = 1;
 
   private constructor() {}
 
@@ -27,50 +25,133 @@ export class ClienteRepository {
     );
   `;
   }
-  
-  gerarProximoId(): number {
-    return this.proximoId++;
-  }
 
   // LISTAGEM
-  listaTodos(): Cliente[] {
-    return this.clientes;
+  async listaTodos(): Promise<Cliente[]> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_cliente, nome, cpf, telefone, email, cidade FROM clientes",
+      [],
+    );
+
+    return linhas.map((linha: any) => {
+      return new Cliente(
+        linha.id_cliente,
+        linha.nome,
+        linha.cpf,
+        linha.telefone,
+        linha.email,
+        linha.cidade,
+      );
+    });
   }
 
   // BUSCA
-  filtraPorId(id: number): Cliente | undefined {
-    return this.clientes.find((cliente) => cliente.id_cliente === id);
+  async filtraPorId(id: number): Promise<Cliente | null> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_cliente, nome, cpf, telefone, email, cidade FROM clientes WHERE id_cliente = ?",
+      [id],
+    );
+
+    if (linhas.length === 0) {
+      return null;
+    }
+
+    const linha = linhas[0];
+
+    return new Cliente(
+      linha.id_cliente,
+      linha.nome,
+      linha.cpf,
+      linha.telefone,
+      linha.email,
+      linha.cidade,
+    );
   }
 
   // CADASTRO
-  cadastra(cliente: Cliente): void {
-    this.clientes.push(cliente);
+  async cadastra(cliente: Cliente): Promise<Cliente> {
+    const resultado = await executarComandoSQL(
+      "INSERT INTO clientes (nome, cpf, telefone, email, cidade) VALUES (?, ?, ?, ?, ?)",
+      [
+        cliente.nome,
+        cliente.cpf,
+        cliente.telefone,
+        cliente.email ?? null,
+        cliente.cidade ?? null,
+      ],
+    );
+
+    return new Cliente(
+      resultado.insertId,
+      cliente.nome,
+      cliente.cpf,
+      cliente.telefone,
+      cliente.email,
+      cliente.cidade,
+    );
   }
 
   // ATUALIZAÇÃO
-  atualiza(id: number, clienteAtualizado: Cliente): boolean {
-    const index = this.clientes.findIndex(
-      (cliente) => cliente.id_cliente === id,
+  async atualiza(
+    id: number,
+    clienteAtualizado: Cliente,
+  ): Promise<Cliente | null> {
+    const resultado = await executarComandoSQL(
+      "UPDATE clientes SET nome = ?, cpf = ?, telefone = ?, email = ?, cidade = ? WHERE id_cliente = ?",
+      [
+        clienteAtualizado.nome,
+        clienteAtualizado.cpf,
+        clienteAtualizado.telefone,
+        clienteAtualizado.email ?? null,
+        clienteAtualizado.cidade ?? null,
+        id,
+      ],
     );
-    if (index !== -1) {
-      this.clientes[index] = clienteAtualizado;
-      return true;
+
+    if (resultado.affectedRows === 0) {
+      return null;
     }
-    return false;
+
+    return new Cliente(
+      id,
+      clienteAtualizado.nome,
+      clienteAtualizado.cpf,
+      clienteAtualizado.telefone,
+      clienteAtualizado.email,
+      clienteAtualizado.cidade,
+    );
   }
 
   // REMOÇÃO
-  remove(id: number): void {
-    const index = this.clientes.findIndex(
-      (cliente) => cliente.id_cliente === id,
+  async remove(id: number): Promise<boolean> {
+    const resultado = await executarComandoSQL(
+      "DELETE FROM clientes WHERE id_cliente = ?",
+      [id],
     );
-    if (index !== -1) {
-      this.clientes.splice(index, 1);
-    }
+
+    return resultado.affectedRows > 0;
   }
 
   // FILTRO INTERNO (RN01) -> Validação acontece na camada de serviço
-  filtraPorCpf(cpf: string): Cliente | undefined {
-    return this.clientes.find((cliente) => cliente.cpf === cpf);
+  async filtraPorCpf(cpf: string): Promise<Cliente | null> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_cliente, nome, cpf, telefone, email, cidade FROM clientes WHERE cpf = ?",
+      [cpf],
+    );
+
+    if (linhas.length === 0) {
+      return null;
+    }
+
+    const linha = linhas[0];
+
+    return new Cliente(
+      linha.id_cliente,
+      linha.nome,
+      linha.cpf,
+      linha.telefone,
+      linha.email,
+      linha.cidade,
+    );
   }
 }
