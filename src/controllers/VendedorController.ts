@@ -88,10 +88,10 @@ export async function removerVendedor(req: Request, res: Response) {
   }
 }
 
-export function listarNotasDoVendedor(req: Request, res: Response) {
+export async function listarNotasDoVendedor(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const notas = notaRepository.filtraNotaPorIdVendedor(id);
+    const notas = await notaRepository.filtraNotaPorIdVendedor(id);
     return res.status(200).json(notas);
   } catch (error: any) {
     return res.status(404).json({ mensagem: error.message });

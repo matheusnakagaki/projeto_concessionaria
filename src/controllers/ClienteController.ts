@@ -81,10 +81,10 @@ export async function removerCliente(req: Request, res: Response) {
   }
 }
 
-export function listarNotasDoCliente(req: Request, res: Response) {
+export async function listarNotasDoCliente(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const notas = notaRepository.filtraNotaPorIdCliente(id);
+    const notas = await notaRepository.filtraNotaPorIdCliente(id);
     return res.status(200).json(notas);
   } catch (error: any) {
     return res.status(404).json({ mensagem: error.message });

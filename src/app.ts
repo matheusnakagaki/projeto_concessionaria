@@ -3,7 +3,7 @@ import { listarClientes,  buscarClientePorId, cadastrarCliente, atualizarCliente
 import { listarVendedores, buscarVendedorPorId, cadastrarVendedor, atualizarVendedor, removerVendedor, listarNotasDoVendedor } from "./controllers/VendedorController";
 import { listarCarros, buscarCarroPorId, cadastrarCarro, atualizarCarro, removerCarro, listarCarrosDisponiveis   } from "./controllers/CarroController";
 import { listarEstoques, buscarEstoquePorId, buscarEstoquePorCarro, cadastrarEstoque, atualizarEstoque, removerEstoque  } from "./controllers/EstoqueController";
-import { listarNotas, buscarNotaPorId, cadastrarNota } from "./controllers/NotaController";
+import { listarNotas, buscarNotaPorId, cadastrarNota, removerNota } from "./controllers/NotaController";
 import { inicializarBanco } from "./database/mysql";
 
 
@@ -52,6 +52,7 @@ app.delete("/estoque/:id", removerEstoque);
 app.get("/notas", listarNotas);
 app.get("/notas/:id", buscarNotaPorId);
 app.post("/notas", cadastrarNota);
+app.delete("/notas/:id", removerNota);
 
 async function startServer() {
   await inicializarBanco();

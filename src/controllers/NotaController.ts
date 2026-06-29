@@ -47,3 +47,9 @@ export async function buscarNotaPorId(req: Request, res: Response) {
     return res.status(404).json({ mensagem: error.message });
   }
 }
+
+export function removerNota(req: Request, res: Response) {
+  return res.status(422).json({
+    mensagem: "Notas fiscais não podem ser removidas após a emissão",
+  });
+}
