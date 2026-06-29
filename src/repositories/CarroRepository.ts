@@ -1,4 +1,5 @@
 import { Carro } from "../models/Carro";
+import { executarComandoSQL } from "../database/mysql";
 
 export class CarroRepository {
   private static instance: CarroRepository;
@@ -12,6 +13,20 @@ export class CarroRepository {
       this.instance = new CarroRepository();
     }
     return this.instance;
+  }
+
+  static getCreateTableQuery(): string {
+    return `
+    CREATE TABLE IF NOT EXISTS carros (
+      id_carro INT AUTO_INCREMENT PRIMARY KEY,
+      marca VARCHAR(100) NOT NULL,
+      modelo VARCHAR(100) NOT NULL,
+      ano INT NOT NULL,
+      placa VARCHAR(20) NOT NULL UNIQUE,
+      preco DECIMAL(10,2) NOT NULL,
+      cor VARCHAR(50) NOT NULL
+    );
+  `;
   }
 
   gerarProximoId(): number {

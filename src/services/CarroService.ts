@@ -125,6 +125,9 @@ export class CarroService {
     const todosOsCarros = this.carroRepository.listaTodos();
 
     return todosOsCarros.filter((carro) => {
+      if (carro.id_carro === null) {
+        return false;
+      }
       const estoque = this.estoqueRepository.filtraPorIdCarro(carro.id_carro);
       return estoque && estoque.quantidade > 0;
     });
