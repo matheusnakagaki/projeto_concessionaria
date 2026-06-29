@@ -76,24 +76,30 @@ export class NotaService {
     }
 
     // Validação de Unididade da PK
-    if (this.notaRepository.filtraPorNumeroNota(numero_nota)) {
+    const notaExistente =
+      await this.notaRepository.filtraPorNumeroNota(numero_nota);
+
+    if (notaExistente) {
       throw new Error("Já existe uma nota com este número");
     }
 
-    const id_nota = this.notaRepository.gerarProximoId();
-
     const novaNota = new Nota(
-      id_nota,
+      null,
       numero_nota,
-      data_emissao,
-      valor_total,
-      id_cliente,
-      id_vendedor,
-      id_carro,
+      dataEmissao,
+      Number(valor_total),
+      Number(id_cliente),
+      Number(id_vendedor),
+      Number(id_carro),
     );
-    this.notaRepository.cadastra(novaNota);
+
+    const notaSalva = await this.notaRepository.cadastra(novaNota);
 
     // Decrementar estoque (RN05)
+    if (estoque.id_estoque === null) {
+      throw new Error("Estoque inválido");
+    }
+
     const estoqueAtualizado = new Estoque(
       estoque.id_estoque,
       estoque.id_carro,
@@ -102,24 +108,25 @@ export class NotaService {
       estoque.data_entrada,
     );
 
-    if (estoque.id_estoque === null) {
-      throw new Error("Estoque inválido");
-    }
     await this.estoqueRepository.atualiza(
       estoque.id_estoque,
       estoqueAtualizado,
     );
 
-    return novaNota;
+    return notaSalva;
   }
 
-  listarNotas(): Nota[] {
-    return this.notaRepository.listaTodos();
+  async listarNotas(): Promise<Nota[]> {
+    return await this.notaRepository.listaTodos();
   }
 
-  buscarPorId(id: number): Nota {
-    const nota = this.notaRepository.filtraPorId(id);
-    if (!nota) throw new Error("Nota não encontrada");
+  async buscarPorId(id: number): Promise<Nota> {
+    const nota = await this.notaRepository.filtraPorId(id);
+
+    if (!nota) {
+      throw new Error("Nota não encontrada");
+    }
+
     return nota;
   }
 }

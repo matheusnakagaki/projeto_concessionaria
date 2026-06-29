@@ -3,8 +3,6 @@ import { executarComandoSQL } from "../database/mysql";
 
 export class NotaRepository {
   private static instance: NotaRepository;
-  private notas: Nota[] = [];
-  private proximoId: number = 1;
 
   private constructor() {}
 
@@ -32,46 +30,162 @@ export class NotaRepository {
   `;
   }
 
-  gerarProximoId(): number {
-    return this.proximoId++;
-  }
-
   // LISTAGEM
-  listaTodos(): Nota[] {
-    return this.notas;
+  async listaTodos(): Promise<Nota[]> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_nota, numero_nota, data_emissao, valor_total, id_cliente, id_vendedor, id_carro FROM notas",
+      [],
+    );
+
+    return linhas.map((linha: any) => {
+      return new Nota(
+        linha.id_nota,
+        linha.numero_nota,
+        new Date(linha.data_emissao),
+        Number(linha.valor_total),
+        linha.id_cliente,
+        linha.id_vendedor,
+        linha.id_carro,
+      );
+    });
   }
 
   // BUSCA POR ID DA NOTA
-  filtraPorId(id: number): Nota | undefined {
-    return this.notas.find((nota) => nota.id_nota === id);
+  async filtraPorId(id: number): Promise<Nota | null> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_nota, numero_nota, data_emissao, valor_total, id_cliente, id_vendedor, id_carro FROM notas WHERE id_nota = ?",
+      [id],
+    );
+
+    if (linhas.length === 0) {
+      return null;
+    }
+
+    const linha = linhas[0];
+
+    return new Nota(
+      linha.id_nota,
+      linha.numero_nota,
+      new Date(linha.data_emissao),
+      Number(linha.valor_total),
+      linha.id_cliente,
+      linha.id_vendedor,
+      linha.id_carro,
+    );
   }
 
   // FILTROS RN
-  filtraNotaPorIdCliente(id_cliente: number): Nota[] {
-    return this.notas.filter((nota) => nota.id_cliente === id_cliente);
+  async filtraNotaPorIdCliente(id_cliente: number): Promise<Nota[]> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_nota, numero_nota, data_emissao, valor_total, id_cliente, id_vendedor, id_carro FROM notas WHERE id_cliente = ?",
+      [id_cliente],
+    );
+
+    return linhas.map((linha: any) => {
+      return new Nota(
+        linha.id_nota,
+        linha.numero_nota,
+        new Date(linha.data_emissao),
+        Number(linha.valor_total),
+        linha.id_cliente,
+        linha.id_vendedor,
+        linha.id_carro,
+      );
+    });
   }
 
-  filtraNotaPorIdVendedor(id_vendedor: number): Nota[] {
-    return this.notas.filter((nota) => nota.id_vendedor === id_vendedor);
+  async filtraNotaPorIdVendedor(id_vendedor: number): Promise<Nota[]> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_nota, numero_nota, data_emissao, valor_total, id_cliente, id_vendedor, id_carro FROM notas WHERE id_vendedor = ?",
+      [id_vendedor],
+    );
+
+    return linhas.map((linha: any) => {
+      return new Nota(
+        linha.id_nota,
+        linha.numero_nota,
+        new Date(linha.data_emissao),
+        Number(linha.valor_total),
+        linha.id_cliente,
+        linha.id_vendedor,
+        linha.id_carro,
+      );
+    });
   }
 
-  filtraNotaPorIdCarro(id_carro: number): Nota[] {
-    return this.notas.filter((nota) => nota.id_carro === id_carro);
+  async filtraNotaPorIdCarro(id_carro: number): Promise<Nota[]> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_nota, numero_nota, data_emissao, valor_total, id_cliente, id_vendedor, id_carro FROM notas WHERE id_carro = ?",
+      [id_carro],
+    );
+
+    return linhas.map((linha: any) => {
+      return new Nota(
+        linha.id_nota,
+        linha.numero_nota,
+        new Date(linha.data_emissao),
+        Number(linha.valor_total),
+        linha.id_cliente,
+        linha.id_vendedor,
+        linha.id_carro,
+      );
+    });
   }
 
-  filtraPorNumeroNota(numero_nota: string): Nota | undefined {
-    return this.notas.find((nota) => nota.numero_nota === numero_nota);
+  async filtraPorNumeroNota(numero_nota: string): Promise<Nota | null> {
+    const linhas = await executarComandoSQL(
+      "SELECT id_nota, numero_nota, data_emissao, valor_total, id_cliente, id_vendedor, id_carro FROM notas WHERE numero_nota = ?",
+      [numero_nota],
+    );
+
+    if (linhas.length === 0) {
+      return null;
+    }
+
+    const linha = linhas[0];
+
+    return new Nota(
+      linha.id_nota,
+      linha.numero_nota,
+      new Date(linha.data_emissao),
+      Number(linha.valor_total),
+      linha.id_cliente,
+      linha.id_vendedor,
+      linha.id_carro,
+    );
   }
-  // CADASTRO
-  cadastra(nota: Nota): void {
-    this.notas.push(nota);
+
+  async cadastra(nota: Nota): Promise<Nota> {
+    const resultado = await executarComandoSQL(
+      "INSERT INTO notas (numero_nota, data_emissao, valor_total, id_cliente, id_vendedor, id_carro) VALUES (?, ?, ?, ?, ?, ?)",
+      [
+        nota.numero_nota,
+        nota.data_emissao,
+        nota.valor_total,
+        nota.id_cliente,
+        nota.id_vendedor,
+        nota.id_carro,
+      ],
+    );
+
+    return new Nota(
+      resultado.insertId,
+      nota.numero_nota,
+      nota.data_emissao,
+      nota.valor_total,
+      nota.id_cliente,
+      nota.id_vendedor,
+      nota.id_carro,
+    );
   }
 
   // REMOÇÃO
-  remove(id: number): void {
-    const index = this.notas.findIndex((nota) => nota.id_nota === id);
-    if (index !== -1) {
-      this.notas.splice(index, 1);
-    }
+  async remove(id: number): Promise<boolean> {
+    const resultado = await executarComandoSQL(
+      "DELETE FROM notas WHERE id_nota = ?",
+      [id],
+    );
+
+    return resultado.affectedRows > 0;
   }
 }

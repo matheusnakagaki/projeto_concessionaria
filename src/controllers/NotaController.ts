@@ -3,12 +3,10 @@ import { NotaService } from "../services/NotaService";
 
 const notaService = new NotaService();
 
-export function cadastrarNota(req: Request, res: Response) {
+export async function cadastrarNota(req: Request, res: Response) {
   try {
-    const novaNota = notaService.cadastrarNota(req.body);
-    res.status(201).json({
-      nota: novaNota,
-    });
+    const novaNota = await notaService.cadastrarNota(req.body);
+    return res.status(201).json(novaNota);
   } catch (error: any) {
     const mensagem = error.message;
     if (
@@ -35,15 +33,15 @@ export function cadastrarNota(req: Request, res: Response) {
   }
 }
 
-export function listarNotas(req: Request, res: Response) {
-  const notas = notaService.listarNotas();
+export async function listarNotas(req: Request, res: Response) {
+  const notas = await notaService.listarNotas();
   return res.status(200).json(notas);
 }
 
-export function buscarNotaPorId(req: Request, res: Response) {
+export async function buscarNotaPorId(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const nota = notaService.buscarPorId(id);
+    const nota = await notaService.buscarPorId(id);
     return res.status(200).json(nota);
   } catch (error: any) {
     return res.status(404).json({ mensagem: error.message });

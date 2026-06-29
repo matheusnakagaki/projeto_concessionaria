@@ -110,7 +110,7 @@ export class CarroService {
     }
 
     const estoqueDoCarro = await this.estoqueRepository.filtraPorIdCarro(id);
-    const notasDoCarro = this.notaRepository.filtraNotaPorIdCarro(id);
+const notasDoCarro = await this.notaRepository.filtraNotaPorIdCarro(id);
 
     if (estoqueDoCarro || notasDoCarro.length > 0) {
       throw new Error(

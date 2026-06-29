@@ -100,15 +100,20 @@ export class VendedorService {
   // RN02: Não permitir remover se tiver notas vinculadas
   async removerVendedor(id: number): Promise<Vendedor> {
     const vendedor = await this.vendedorRepository.filtraPorId(id);
+
     if (!vendedor) {
       throw new Error("Vendedor não encontrado");
     }
-    const notasDoVendedor = this.notaRepository.filtraNotaPorIdVendedor(id);
+
+    const notasDoVendedor =
+      await this.notaRepository.filtraNotaPorIdVendedor(id);
+
     if (notasDoVendedor.length > 0) {
       throw new Error(
         "Não é permitido remover vendedor que possui notas fiscais vinculadas",
       );
     }
+
     await this.vendedorRepository.remove(id);
 
     return vendedor;

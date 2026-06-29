@@ -89,7 +89,7 @@ export class ClienteService {
       throw new Error("Cliente não encontrado");
     }
 
-    const notasDoCliente = this.notaRepository.filtraNotaPorIdCliente(id);
+    const notasDoCliente = await this.notaRepository.filtraNotaPorIdCliente(id);
     if (notasDoCliente.length > 0) {
       throw new Error(
         "Não é permitido remover cliente que possui notas fiscais vinculadas",
