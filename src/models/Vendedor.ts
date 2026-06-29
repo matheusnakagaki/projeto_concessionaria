@@ -1,8 +1,18 @@
 export class Vendedor {
+  id_vendedor: number | null;
+  nome: string;
+  matricula: string;
+  comissao_percentual: number;
+
   constructor(
-    public id_vendedor: number | null,
-    public nome: string,
-    public matricula: string,
-    public comissao_percentual: number
-  ) {}
+    id_vendedor: number | null,
+    nome: string,
+    matricula: string,
+    comissao_percentual: number,
+  ) {
+    this.id_vendedor = id_vendedor;
+    this.nome = nome;
+    this.matricula = matricula;
+    this.comissao_percentual = comissao_percentual;
+  }
 }

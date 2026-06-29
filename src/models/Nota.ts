@@ -1,19 +1,27 @@
 export class Nota {
-    id_nota: number;
-    numero_nota: string;
-    data_emissao: Date;
-    valor_total: number;
-    id_cliente: number;
-    id_vendedor: number;
-    id_carro: number;
+  id_nota: number | null;
+  numero_nota: string;
+  data_emissao: Date;
+  valor_total: number;
+  id_cliente: number;
+  id_vendedor: number;
+  id_carro: number;
 
-    constructor(id_nota: number, numero_nota: string, data_emissao: Date, valor_total: number, id_cliente: number, id_vendedor: number, id_carro: number) {
-        this.id_nota = id_nota;
-        this.numero_nota = numero_nota;
-        this.data_emissao = data_emissao;
-        this.valor_total = valor_total;
-        this.id_cliente = id_cliente;
-        this.id_vendedor = id_vendedor;
-        this.id_carro = id_carro;
-    }
+  constructor(
+    id_nota: number | null,
+    numero_nota: string,
+    data_emissao: Date,
+    valor_total: number,
+    id_cliente: number,
+    id_vendedor: number,
+    id_carro: number,
+  ) {
+    this.id_nota = id_nota;
+    this.numero_nota = numero_nota;
+    this.data_emissao = data_emissao;
+    this.valor_total = valor_total;
+    this.id_cliente = id_cliente;
+    this.id_vendedor = id_vendedor;
+    this.id_carro = id_carro;
+  }
 }
