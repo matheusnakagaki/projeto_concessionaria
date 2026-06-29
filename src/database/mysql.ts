@@ -1,6 +1,7 @@
 import mysql, { Connection, QueryError } from "mysql2";
 import dotenv from "dotenv";
 import { ClienteRepository } from "../repositories/ClienteRepository";
+import { VendedorRepository } from "../repositories/VendedorRepository";
 
 dotenv.config();
 
@@ -52,7 +53,10 @@ export async function inicializarBanco(): Promise<void> {
 
     await executarComandoSQL(`USE ${databaseName}`, []);
 
-    const schemas = [ClienteRepository.getCreateTableQuery()];
+    const schemas = [
+      ClienteRepository.getCreateTableQuery(),
+      VendedorRepository.getCreateTableQuery(),
+    ];
 
     for (const query of schemas) {
       await executarComandoSQL(query, []);

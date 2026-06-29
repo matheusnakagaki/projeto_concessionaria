@@ -14,6 +14,17 @@ export class VendedorRepository {
     return this.instance;
   }
 
+  static getCreateTableQuery(): string {
+  return `
+    CREATE TABLE IF NOT EXISTS vendedores (
+      id_vendedor INT AUTO_INCREMENT PRIMARY KEY,
+      nome VARCHAR(255) NOT NULL,
+      matricula VARCHAR(50) NOT NULL UNIQUE,
+      comissao_percentual DECIMAL(5,2) NOT NULL
+    );
+  `;
+}
+
   gerarProximoId(): number {
     return this.proximoId++;
   }
