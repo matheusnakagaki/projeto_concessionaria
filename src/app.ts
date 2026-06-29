@@ -4,6 +4,7 @@ import { listarVendedores, buscarVendedorPorId, cadastrarVendedor, atualizarVend
 import { listarCarros, buscarCarroPorId, cadastrarCarro, atualizarCarro, removerCarro, listarCarrosDisponiveis   } from "./controllers/CarroController";
 import { listarEstoques, buscarEstoquePorId, buscarEstoquePorIdCarro, cadastrarEstoque, atualizarEstoque, removerEstoque  } from "./controllers/EstoqueController";
 import { listarNotas, buscarNotaPorId, cadastrarNota } from "./controllers/NotaController";
+import { inicializarBanco } from "./database/mysql";
 
 
 const app = express();
@@ -52,4 +53,10 @@ app.get("/notas", listarNotas);
 app.get("/notas/:id", buscarNotaPorId);
 app.post("/notas", cadastrarNota);
 
-app.listen(PORT, logInfo);
+async function startServer() {
+  await inicializarBanco();
+
+  app.listen(PORT, logInfo);
+}
+
+startServer();
