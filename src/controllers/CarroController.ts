@@ -3,9 +3,9 @@ import { CarroService } from "../services/CarroService";
 
 const carroService = new CarroService();
 
-export function cadastrarCarro(req: Request, res: Response) {
+export async function cadastrarCarro(req: Request, res: Response) {
   try {
-    const novoCarro = carroService.cadastrarCarro(req.body);
+    const novoCarro = await carroService.cadastrarCarro(req.body);
     res.status(201).json({
       carro: novoCarro,
     });
@@ -26,30 +26,32 @@ export function cadastrarCarro(req: Request, res: Response) {
   }
 }
 
-export function listarCarros(req: Request, res: Response) {
+export async function listarCarros(req: Request, res: Response) {
   const disponivel = req.query.disponivel;
+
   if (disponivel === "true") {
-    const carrosDisponiveis = carroService.listarCarrosDisponiveis();
+    const carrosDisponiveis = await carroService.listarCarrosDisponiveis();
     return res.status(200).json(carrosDisponiveis);
   }
-  const todos = carroService.listarCarros();
+
+  const todos = await carroService.listarCarros();
   return res.status(200).json(todos);
 }
 
-export function buscarCarroPorId(req: Request, res: Response) {
+export async function buscarCarroPorId(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const carro = carroService.buscarPorId(id);
+    const carro = await carroService.buscarPorId(id);
     return res.status(200).json(carro);
   } catch (error: any) {
     return res.status(404).json({ mensagem: error.message });
   }
 }
 
-export function atualizarCarro(req: Request, res: Response) {
+export async function atualizarCarro(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    const carroAtualizado = carroService.atualizarCarro(id, req.body);
+    const carroAtualizado = await carroService.atualizarCarro(id, req.body);
     return res.status(200).json(carroAtualizado);
   } catch (error: any) {
     const mensagem = error.message;
@@ -74,10 +76,10 @@ export function atualizarCarro(req: Request, res: Response) {
   }
 }
 
-export function removerCarro(req: Request, res: Response) {
+export async function removerCarro(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id as string);
-    carroService.removerCarro(id);
+    const carroRemovido = await carroService.removerCarro(id);
     return res.status(200).json({
       mensagem: "Carro removido com sucesso!",
     });
@@ -93,7 +95,7 @@ export function removerCarro(req: Request, res: Response) {
   }
 }
 
-export function listarCarrosDisponiveis(req: Request, res: Response) {
-  const carros = carroService.listarCarrosDisponiveis();
+export async function listarCarrosDisponiveis(req: Request, res: Response) {
+  const carros = await carroService.listarCarrosDisponiveis();
   return res.status(200).json(carros);
 }

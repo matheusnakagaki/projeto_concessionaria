@@ -8,15 +8,17 @@ export class CarroService {
   notaRepository: NotaRepository = NotaRepository.getInstance();
   estoqueRepository: EstoqueRepository = EstoqueRepository.getInstance();
 
-  cadastrarCarro(dadosCarro: any): Carro {
+  async cadastrarCarro(dadosCarro: any): Promise<Carro> {
     const { marca, modelo, ano, placa, preco, cor } = dadosCarro;
 
     if (!marca || !modelo || !ano || !placa || preco === undefined || !cor) {
       throw new Error("Informações obrigatórias incompletas");
     }
     // Unicidade da chave primária
-    if (this.carroRepository.filtraPorPlaca(placa)) {
-      throw new Error("Já existe um carro com esta Placa");
+    const carroExistente = await this.carroRepository.filtraPorPlaca(placa);
+
+    if (carroExistente) {
+      throw new Error("Já existe um carro com esta placa");
     }
     const anoAtual = new Date().getFullYear();
     if (ano < 1950 || ano > anoAtual + 1) {
@@ -26,33 +28,27 @@ export class CarroService {
       throw new Error("O valor do carro deve ser maior que zero");
     }
 
-    const id_carro = this.carroRepository.gerarProximoId();
+    const novoCarro = new Carro(null, marca, modelo, ano, placa, preco, cor);
 
-    const novoCarro = new Carro(
-      id_carro,
-      marca,
-      modelo,
-      ano,
-      placa,
-      preco,
-      cor,
-    );
-    this.carroRepository.cadastra(novoCarro);
-    return novoCarro;
+    return await this.carroRepository.cadastra(novoCarro);
   }
 
-  listarCarros(): Carro[] {
-    return this.carroRepository.listaTodos();
+  async listarCarros(): Promise<Carro[]> {
+    return await this.carroRepository.listaTodos();
   }
 
-  buscarPorId(id: number): Carro {
-    const carro = this.carroRepository.filtraPorId(id);
-    if (!carro) throw new Error("Carro não encontrado");
+  async buscarPorId(id: number): Promise<Carro> {
+    const carro = await this.carroRepository.filtraPorId(id);
+
+    if (!carro) {
+      throw new Error("Carro não encontrado");
+    }
+
     return carro;
   }
 
-  atualizarCarro(id: number, dados: any): Carro {
-    const carroExistente = this.carroRepository.filtraPorId(id);
+  async atualizarCarro(id: number, dados: any): Promise<Carro> {
+    const carroExistente = await this.carroRepository.filtraPorId(id);
     if (!carroExistente) {
       throw new Error("Carro não encontrado");
     }
@@ -73,7 +69,7 @@ export class CarroService {
       throw new Error("Informações obrigatórias incompletas");
     }
 
-    const carroComMesmaPlaca = this.carroRepository.filtraPorPlaca(placa);
+    const carroComMesmaPlaca = await this.carroRepository.filtraPorPlaca(placa);
     if (carroComMesmaPlaca && carroComMesmaPlaca.id_carro !== id) {
       throw new Error("Já existe um carro com esta placa");
     }
@@ -96,14 +92,18 @@ export class CarroService {
       cor,
     );
 
-    this.carroRepository.atualiza(id, carroAtualizado);
+    const carroSalvo = await this.carroRepository.atualiza(id, carroAtualizado);
 
-    return carroAtualizado;
+    if (!carroSalvo) {
+      throw new Error("Carro não encontrado");
+    }
+
+    return carroSalvo;
   }
 
   // RN03: Não permitir remover se tiver notas vinculadas
-  removerCarro(id: number): void {
-    const carro = this.carroRepository.filtraPorId(id);
+  async removerCarro(id: number): Promise<Carro> {
+    const carro = await this.carroRepository.filtraPorId(id);
 
     if (!carro) {
       throw new Error("Carro não encontrado");
@@ -118,11 +118,13 @@ export class CarroService {
       );
     }
 
-    this.carroRepository.remove(id);
+    await this.carroRepository.remove(id);
+
+    return carro;
   }
 
-  listarCarrosDisponiveis(): Carro[] {
-    const todosOsCarros = this.carroRepository.listaTodos();
+  async listarCarrosDisponiveis(): Promise<Carro[]> {
+    const todosOsCarros = await this.carroRepository.listaTodos();
 
     return todosOsCarros.filter((carro) => {
       if (carro.id_carro === null) {
