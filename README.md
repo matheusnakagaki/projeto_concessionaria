@@ -1,4 +1,4 @@
-# 🚗 API Concessionária - Projeto II
+# 🚗 API Concessionária - Projeto V2
 
 API REST desenvolvida para o gerenciamento de uma concessionária de veículos, criada como projeto avaliativo da disciplina de **Programação Web** do Curso Superior de Tecnologia em **Análise e Desenvolvimento de Sistemas (ADS)** do **IFSP - Câmpus Boituva**.
 
