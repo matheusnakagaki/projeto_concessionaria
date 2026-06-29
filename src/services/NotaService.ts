@@ -1,5 +1,5 @@
 import { Nota } from "../models/Nota";
-import { Estoque } from "../models/Estoque"
+import { Estoque } from "../models/Estoque";
 import { NotaRepository } from "../repositories/NotaRepository";
 import { EstoqueRepository } from "../repositories/EstoqueRepository";
 import { CarroRepository } from "../repositories/CarroRepository";
@@ -88,6 +88,9 @@ export class NotaService {
       estoque.data_entrada,
     );
 
+    if (estoque.id_estoque === null) {
+      throw new Error("Estoque inválido");
+    }
     this.estoqueRepository.atualiza(estoque.id_estoque, estoqueAtualizado);
 
     return novaNota;

@@ -14,6 +14,19 @@ export class EstoqueRepository {
     return this.instance;
   }
 
+  static getCreateTableQuery(): string {
+    return `
+    CREATE TABLE IF NOT EXISTS estoque (
+      id_estoque INT AUTO_INCREMENT PRIMARY KEY,
+      id_carro INT NOT NULL UNIQUE,
+      quantidade INT NOT NULL,
+      localizacao_patio VARCHAR(100) NOT NULL,
+      data_entrada DATE NOT NULL,
+      FOREIGN KEY (id_carro) REFERENCES carros(id_carro)
+    );
+  `;
+  }
+
   gerarProximoId(): number {
     return this.proximoId++;
   }
@@ -42,7 +55,9 @@ export class EstoqueRepository {
 
   // ATUALIZAÇÃO
   atualiza(id: number, estoqueAtualizado: Estoque): boolean {
-    const index = this.estoqueCompleto.findIndex((estoque) => estoque.id_estoque === id);
+    const index = this.estoqueCompleto.findIndex(
+      (estoque) => estoque.id_estoque === id,
+    );
     if (index !== -1) {
       this.estoqueCompleto[index] = estoqueAtualizado;
       return true;

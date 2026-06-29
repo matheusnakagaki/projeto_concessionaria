@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { ClienteRepository } from "../repositories/ClienteRepository";
 import { VendedorRepository } from "../repositories/VendedorRepository";
 import { CarroRepository } from "../repositories/CarroRepository";
+import { EstoqueRepository } from "../repositories/EstoqueRepository";
 
 dotenv.config();
 
@@ -58,6 +59,7 @@ export async function inicializarBanco(): Promise<void> {
       ClienteRepository.getCreateTableQuery(),
       VendedorRepository.getCreateTableQuery(),
       CarroRepository.getCreateTableQuery(),
+      EstoqueRepository.getCreateTableQuery(),
     ];
 
     for (const query of schemas) {
