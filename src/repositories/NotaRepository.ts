@@ -1,4 +1,5 @@
 import { Nota } from "../models/Nota";
+import { executarComandoSQL } from "../database/mysql";
 
 export class NotaRepository {
   private static instance: NotaRepository;
@@ -12,6 +13,23 @@ export class NotaRepository {
       this.instance = new NotaRepository();
     }
     return this.instance;
+  }
+
+  static getCreateTableQuery(): string {
+    return `
+    CREATE TABLE IF NOT EXISTS notas (
+      id_nota INT AUTO_INCREMENT PRIMARY KEY,
+      numero_nota VARCHAR(50) NOT NULL UNIQUE,
+      data_emissao DATE NOT NULL,
+      valor_total DECIMAL(10,2) NOT NULL,
+      id_cliente INT NOT NULL,
+      id_vendedor INT NOT NULL,
+      id_carro INT NOT NULL,
+      FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
+      FOREIGN KEY (id_vendedor) REFERENCES vendedores(id_vendedor),
+      FOREIGN KEY (id_carro) REFERENCES carros(id_carro)
+    );
+  `;
   }
 
   gerarProximoId(): number {
